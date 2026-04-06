@@ -1,0 +1,502 @@
+[
+  {
+    "id": "nieman-lab-how-v-spehar-built-a-news-business-from-under-a-desk-https-www-nieman",
+    "title": "How V Spehar built a news business from under a desk",
+    "url": "https://www.niemanlab.org/2026/04/how-v-spehar-built-a-news-business-from-under-a-desk/",
+    "source": "Nieman Lab",
+    "source_type": "reporting",
+    "published_at": "2026-04-06T19:23:17.000Z",
+    "raw_snippet": "It was technology and culture reporter Taylor Lorenz who first told news creator Vitus \"V\" Spehar to think of themselves as a journalist. It was 2022 and Spehar — the 43-year-old best known for their explainers as @UndertheDeskNews on social media — was two years into explaining the news online. They were interviewing Lorenz for...",
+    "created_at": "2026-04-06T20:51:30.540Z"
+  },
+  {
+    "id": "aws-machine-learning-blog-build-ai-powered-employee-onboarding-agents-with-amazo",
+    "title": "Build AI-powered employee onboarding agents with Amazon Quick",
+    "url": "https://aws.amazon.com/blogs/machine-learning/build-ai-powered-employee-onboarding-agents-with-amazon-quick/",
+    "source": "AWS Machine Learning Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-06T18:00:06.000Z",
+    "raw_snippet": "In this post, we walk through building a custom HR onboarding agent with Quick. We show how to configure an agent that understands your organization’s processes, connects to your HR systems, and automates common tasks, such as answering new-hire questions and tracking document completion.",
+    "created_at": "2026-04-06T20:51:30.580Z"
+  },
+  {
+    "id": "stratechery-openai-buys-tbpn-tech-and-the-token-tsunami-https-stratechery-com-20",
+    "title": "OpenAI Buys TBPN, Tech and the Token Tsunami",
+    "url": "https://stratechery.com/2026/openai-buys-tbpn-tech-and-the-token-tsunami/",
+    "source": "Stratechery",
+    "source_type": "analysis",
+    "published_at": "2026-04-06T10:00:00.000Z",
+    "raw_snippet": "OpenAI's purchase of TBPN makes no sense, which may be par for the course for OpenAI. Then, AI is breaking stuff, starting with tech services.",
+    "created_at": "2026-04-06T20:51:30.527Z"
+  },
+  {
+    "id": "nieman-lab-the-ap-is-offering-buyouts-in-a-pivot-away-from-newspapers-https-www-",
+    "title": "The AP is offering buyouts in a pivot away from newspapers",
+    "url": "https://www.niemanlab.org/2026/04/the-ap-is-offering-buyouts-in-a-pivot-away-from-newspapers/",
+    "source": "Nieman Lab",
+    "source_type": "reporting",
+    "published_at": "2026-04-06T18:47:15.000Z",
+    "raw_snippet": "For 180 years, ever since it was founded by five New York newspapers in 1846 to help share the costs of reporting on the Mexican-American war, newspapers have been a part of the Associated Press' business. Today, it announced that's changing, and has offered buyouts to an unspecified number of journalists based in the U.S....",
+    "created_at": "2026-04-06T20:51:30.540Z"
+  },
+  {
+    "id": "aws-machine-learning-blog-accelerate-agentic-tool-calling-with-serverless-model-",
+    "title": "Accelerate agentic tool calling with serverless model customization in Amazon SageMaker AI",
+    "url": "https://aws.amazon.com/blogs/machine-learning/accelerate-agentic-tool-calling-with-serverless-model-customization-in-amazon-sagemaker-ai/",
+    "source": "AWS Machine Learning Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-06T17:54:00.000Z",
+    "raw_snippet": "In this post, we walk through how we fine-tuned Qwen 2.5 7B Instruct for tool calling using RLVR. We cover dataset preparation across three distinct agent behaviors, reward function design with tiered scoring, training configuration and results interpretation, evaluation on held-out data with unseen tools, and deployment.",
+    "created_at": "2026-04-06T20:51:30.580Z"
+  },
+  {
+    "id": "simon-willison-eight-years-of-wanting-three-months-of-building-with-ai-https-sim",
+    "title": "Eight years of wanting, three months of building with AI",
+    "url": "https://simonwillison.net/2026/Apr/5/building-with-ai/#atom-everything",
+    "source": "Simon Willison",
+    "source_type": "analysis",
+    "published_at": "2026-04-05T23:54:18.000Z",
+    "raw_snippet": "Eight years of wanting, three months of building with AI Lalit Maganti provides one of my favorite pieces of long-form writing on agentic engineering I've seen in ages. They spent eight years thinking about and then three months building syntaqlite , which they describe as \" high-fidelity devtools that SQLite deserves \". The goal was to provide fast, robust and comprehensive linting and verifying tools for SQLite, s...",
+    "created_at": "2026-04-06T20:51:30.516Z"
+  },
+  {
+    "id": "platformer-exclusive-meta-has-discussed-ending-funding-to-the-oversight-board-ht",
+    "title": "Exclusive: Meta has discussed ending funding to the Oversight Board",
+    "url": "https://www.platformer.news/meta-oversight-board-funding-cancel/",
+    "source": "Platformer",
+    "source_type": "reporting",
+    "published_at": "2026-04-02T22:30:59.000Z",
+    "raw_snippet": "Shifting priorities and budget pressures could bring an end to the company’s experiment in independent governance, sources say",
+    "created_at": "2026-04-06T20:51:30.625Z"
+  },
+  {
+    "id": "aws-machine-learning-blog-building-intelligent-search-with-amazon-bedrock-and-am",
+    "title": "Building Intelligent Search with Amazon Bedrock and Amazon OpenSearch for hybrid RAG solutions",
+    "url": "https://aws.amazon.com/blogs/machine-learning/building-intelligent-search-with-amazon-bedrock-and-amazon-opensearch-for-hybrid-rag-solutions/",
+    "source": "AWS Machine Learning Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-06T17:49:32.000Z",
+    "raw_snippet": "In this post, we show how to implement a generative AI agentic assistant that uses both semantic and text-based search using Amazon Bedrock, Amazon Bedrock AgentCore, Strands Agents and Amazon OpenSearch.",
+    "created_at": "2026-04-06T20:51:30.580Z"
+  },
+  {
+    "id": "simon-willison-vulnerability-research-is-cooked-https-simonwillison-net-2026-apr",
+    "title": "Vulnerability Research Is Cooked",
+    "url": "https://simonwillison.net/2026/Apr/3/vulnerability-research-is-cooked/#atom-everything",
+    "source": "Simon Willison",
+    "source_type": "analysis",
+    "published_at": "2026-04-03T23:59:08.000Z",
+    "raw_snippet": "Vulnerability Research Is Cooked Thomas Ptacek's take on the sudden and enormous impact the latest frontier models are having on the field of vulnerability research. Within the next few months, coding agents will drastically alter both the practice and the economics of exploit development. Frontier model improvement won’t be a slow burn, but rather a step function. Substantial amounts of high-impact vulnerability re...",
+    "created_at": "2026-04-06T20:51:30.517Z"
+  },
+  {
+    "id": "nieman-lab-the-provincetown-independent-s-reporters-couldn-t-find-housing-so-the",
+    "title": "The Provincetown Independent’s reporters couldn’t find housing. So the Local Journalism Project bought a condo for them to rent.",
+    "url": "https://www.niemanlab.org/2026/04/the-provincetown-independents-reporters-couldnt-find-housing-so-the-local-journalism-project-bought-a-condo-for-them-to-rent/",
+    "source": "Nieman Lab",
+    "source_type": "reporting",
+    "published_at": "2026-04-02T19:55:56.000Z",
+    "raw_snippet": "Paying the rent on a reporter's salary isn't easy anywhere these days. But on the Outer Cape, it's almost impossible. Massachusetts has some of the highest housing costs in the country. The problem is exacerbated on Cape Cod's Outer Cape, a region that includes Provincetown, Truro, Wellfleet, and Eastham. In a community where the same...",
+    "created_at": "2026-04-06T20:51:30.540Z"
+  },
+  {
+    "id": "aws-machine-learning-blog-from-isolated-alerts-to-contextual-intelligence-agenti",
+    "title": "From isolated alerts to contextual intelligence: Agentic maritime anomaly analysis with generative AI",
+    "url": "https://aws.amazon.com/blogs/machine-learning/from-isolated-alerts-to-contextual-intelligence-agentic-maritime-anomaly-analysis-with-generative-ai/",
+    "source": "AWS Machine Learning Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-06T17:48:54.000Z",
+    "raw_snippet": "This blog post demonstrates how Windward helps enhance and accelerate alert investigation processes by combining geospatial intelligence with generative AI, enabling analysts to focus on decision-making rather than data collection.",
+    "created_at": "2026-04-06T20:51:30.580Z"
+  },
+  {
+    "id": "simon-willison-the-cognitive-impact-of-coding-agents-https-simonwillison-net-202",
+    "title": "The cognitive impact of coding agents",
+    "url": "https://simonwillison.net/2026/Apr/3/cognitive-cost/#atom-everything",
+    "source": "Simon Willison",
+    "source_type": "analysis",
+    "published_at": "2026-04-03T23:57:04.000Z",
+    "raw_snippet": "A fun thing about recording a podcast with a professional like Lenny Rachitsky is that his team know how to slice the resulting video up into TikTok-sized short form vertical videos. Here's one he shared on Twitter today which ended up attracting over 1.1m views! That was 48 seconds. Our full conversation lasted 1 hour 40 minutes. Tags: ai-ethics , coding-agents , agentic-engineering , generative-ai , podcast-appear...",
+    "created_at": "2026-04-06T20:51:30.517Z"
+  },
+  {
+    "id": "nieman-lab-amid-internal-uncertainty-the-vtdigger-s-new-union-contract-guarantee",
+    "title": "Amid internal uncertainty, the VTDigger’s new union contract guarantees journalists’ input on AI use",
+    "url": "https://www.niemanlab.org/2026/04/__trashed-83/",
+    "source": "Nieman Lab",
+    "source_type": "reporting",
+    "published_at": "2026-04-02T18:47:41.000Z",
+    "raw_snippet": "After a year of negotiating, the VTDigger Guild ratified its second-ever union contract on April 1 with VTDigger, the nonprofit news outlet covering Vermont. The new four-year agreement guarantees a 32.5% increase to the minimum salary for reporters, more paid time off, and journalists' input on the use of artificial intelligence. Here's what the contract...",
+    "created_at": "2026-04-06T20:51:30.540Z"
+  },
+  {
+    "id": "aws-machine-learning-blog-connecting-mcp-servers-to-amazon-bedrock-agentcore-gat",
+    "title": "Connecting MCP servers to Amazon Bedrock AgentCore Gateway using Authorization Code flow",
+    "url": "https://aws.amazon.com/blogs/machine-learning/connecting-mcp-servers-to-amazon-bedrock-agentcore-gateway-using-authorization-code-flow/",
+    "source": "AWS Machine Learning Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-06T14:41:46.000Z",
+    "raw_snippet": "Amazon Bedrock AgentCore Gateway provides a centralized layer for managing how AI agents connect to tools and MCP servers across your organization. In this post, we walk through how to configure AgentCore Gateway to connect to an OAuth-protected MCP server using the Authorization Code flow.",
+    "created_at": "2026-04-06T20:51:30.580Z"
+  },
+  {
+    "id": "simon-willison-quoting-greg-kroah-hartman-https-simonwillison-net-2026-apr-3-gre",
+    "title": "Quoting Greg Kroah-Hartman",
+    "url": "https://simonwillison.net/2026/Apr/3/greg-kroah-hartman/#atom-everything",
+    "source": "Simon Willison",
+    "source_type": "analysis",
+    "published_at": "2026-04-03T21:44:41.000Z",
+    "raw_snippet": "Months ago, we were getting what we called 'AI slop,' AI-generated security reports that were obviously wrong or low quality. It was kind of funny. It didn't really worry us. Something happened a month ago, and the world switched. Now we have real reports. All open source projects have real reports that are made with AI, but they're good, and they're real. &mdash; Greg Kroah-Hartman , Linux kernel maintainer ( bio )...",
+    "created_at": "2026-04-06T20:51:30.517Z"
+  },
+  {
+    "id": "nieman-lab-the-nonprofit-salt-lake-tribune-is-ready-to-tear-down-its-paywall-htt",
+    "title": "The nonprofit Salt Lake Tribune is ready to tear down its paywall",
+    "url": "https://www.niemanlab.org/2026/04/the-nonprofit-salt-lake-tribune-is-ready-to-tear-down-its-paywall/",
+    "source": "Nieman Lab",
+    "source_type": "reporting",
+    "published_at": "2026-04-01T18:05:58.000Z",
+    "raw_snippet": "After two years of planning, there's finally a date. Well, okay, a month: May. That's when the Salt Lake Tribune, Utah's largest newspaper, will drop its paywall. \"Starting in May, all newly published stories on sltrib.com and in the app will be free to read — no subscription required,\" wrote CEO and executive editor Lauren...",
+    "created_at": "2026-04-06T20:51:30.540Z"
+  },
+  {
+    "id": "openai-announcing-the-openai-safety-fellowship-https-openai-com-index-introducin",
+    "title": "Announcing the OpenAI Safety Fellowship",
+    "url": "https://openai.com/index/introducing-openai-safety-fellowship",
+    "source": "OpenAI",
+    "source_type": "primary",
+    "published_at": "2026-04-06T10:00:00.000Z",
+    "raw_snippet": "A pilot program to support independent safety and alignment research and develop the next generation of talent",
+    "created_at": "2026-04-06T20:51:30.982Z"
+  },
+  {
+    "id": "stratechery-2026-14-apple-acceleration-and-ai-https-stratechery-com-2026-apple-a",
+    "title": "2026.14: Apple, Acceleration, and AI",
+    "url": "https://stratechery.com/2026/apple-acceleration-and-ai/",
+    "source": "Stratechery",
+    "source_type": "analysis",
+    "published_at": "2026-04-03T17:00:00.000Z",
+    "raw_snippet": "The best Stratechery content from the week of March 30, 2026, including Formula 1 spinning off track, Apple's first and next 50 years, and security and AI.",
+    "created_at": "2026-04-06T20:51:30.527Z"
+  },
+  {
+    "id": "platformer-can-you-have-child-safety-and-section-230-too-https-www-platformer-ne",
+    "title": "Can you have child safety and Section 230, too?",
+    "url": "https://www.platformer.news/social-media-trials-230-content-design/",
+    "source": "Platformer",
+    "source_type": "reporting",
+    "published_at": "2026-04-01T01:41:03.000Z",
+    "raw_snippet": "The verdicts in last week’s social media trials have alarmed open-internet advocates. But it’s possible to regulate platform design while also protecting speech",
+    "created_at": "2026-04-06T20:51:30.625Z"
+  },
+  {
+    "id": "openai-industrial-policy-for-the-intelligence-age-https-openai-com-index-industr",
+    "title": "Industrial policy for the Intelligence Age",
+    "url": "https://openai.com/index/industrial-policy-for-the-intelligence-age",
+    "source": "OpenAI",
+    "source_type": "primary",
+    "published_at": "2026-04-06T02:30:00.000Z",
+    "raw_snippet": "Explore our ambitious, people-first industrial policy ideas for the AI era—focused on expanding opportunity, sharing prosperity, and building resilient institutions as advanced intelligence evolves.",
+    "created_at": "2026-04-06T20:51:30.982Z"
+  },
+  {
+    "id": "simon-willison-can-javascript-escape-a-csp-meta-tag-inside-an-iframe-https-simon",
+    "title": "Can JavaScript Escape a CSP Meta Tag Inside an Iframe?",
+    "url": "https://simonwillison.net/2026/Apr/3/test-csp-iframe-escape/#atom-everything",
+    "source": "Simon Willison",
+    "source_type": "analysis",
+    "published_at": "2026-04-03T16:05:00.000Z",
+    "raw_snippet": "Research: Can JavaScript Escape a CSP Meta Tag Inside an Iframe? In trying to build my own version of Claude Artifacts I got curious about options for applying CSP headers to content in sandboxed iframes without using a separate domain to host the files. Turns out you can inject <meta http-equiv=\"Content-Security-Policy\"...> tags at the top of the iframe content and they'll be obeyed even if subsequent untrusted Jav...",
+    "created_at": "2026-04-06T20:51:30.517Z"
+  },
+  {
+    "id": "platformer-mark-zuckerberg-is-doing-content-moderation-again-https-www-platforme",
+    "title": "Mark Zuckerberg is doing content moderation again",
+    "url": "https://www.platformer.news/zuckerberg-musk-texts-trial-content-moderation/",
+    "source": "Platformer",
+    "source_type": "reporting",
+    "published_at": "2026-03-31T00:33:39.000Z",
+    "raw_snippet": "Meta’s CEO said he didn't want to be the speech police. Then he texted Elon Musk",
+    "created_at": "2026-04-06T20:51:30.625Z"
+  },
+  {
+    "id": "netflix-techblog-powering-multimodal-intelligence-for-video-search-https-netflix",
+    "title": "Powering Multimodal Intelligence for Video Search",
+    "url": "https://netflixtechblog.com/powering-multimodal-intelligence-for-video-search-3e0020cf1202?source=rss-c3aeaf49d8a4------2",
+    "source": "Netflix TechBlog",
+    "source_type": "primary",
+    "published_at": "2026-04-03T23:54:23.000Z",
+    "raw_snippet": "",
+    "created_at": "2026-04-06T20:51:30.617Z"
+  },
+  {
+    "id": "simon-willison-the-axios-supply-chain-attack-used-individually-targeted-social-e",
+    "title": "The Axios supply chain attack used individually targeted social engineering",
+    "url": "https://simonwillison.net/2026/Apr/3/supply-chain-social-engineering/#atom-everything",
+    "source": "Simon Willison",
+    "source_type": "analysis",
+    "published_at": "2026-04-03T13:54:53.000Z",
+    "raw_snippet": "The Axios team have published a full postmortem on the supply chain attack which resulted in a malware dependency going out in a release the other day , and it involved a sophisticated social engineering campaign targeting one of their maintainers directly. Here's Jason Saayman'a description of how that worked : so the attack vector mimics what google has documented here: https://cloud.google.com/blog/topics/threat-...",
+    "created_at": "2026-04-06T20:51:30.517Z"
+  },
+  {
+    "id": "nieman-lab-the-guardian-experiments-with-republishing-its-food-newsletter-on-sub",
+    "title": "The Guardian experiments with republishing its food newsletter on Substack",
+    "url": "https://www.niemanlab.org/2026/03/the-guardian-experiments-with-republishing-its-food-newsletter-on-substack/",
+    "source": "Nieman Lab",
+    "source_type": "reporting",
+    "published_at": "2026-03-30T19:14:03.000Z",
+    "raw_snippet": "The Guardian has started cross-posting its weekly food newsletter, \"Feast,\" to Substack, where it hopes to reach new audiences. This is an experiment, according to Press Gazette's reporting; if Feast succeeds on Substack, The Guardian may progress to offering unique content on the platform, and republishing other existing newsletters there. Press Gazette reported that the...",
+    "created_at": "2026-04-06T20:51:30.540Z"
+  },
+  {
+    "id": "netflix-techblog-smarter-live-streaming-at-scale-rolling-out-vbr-for-all-netflix",
+    "title": "Smarter Live Streaming at Scale: Rolling Out VBR for All Netflix Live Events",
+    "url": "https://netflixtechblog.com/smarter-live-streaming-at-scale-rolling-out-vbr-for-all-netflix-live-events-c8f833b238cc?source=rss-c3aeaf49d8a4------2",
+    "source": "Netflix TechBlog",
+    "source_type": "primary",
+    "published_at": "2026-04-02T21:46:26.000Z",
+    "raw_snippet": "",
+    "created_at": "2026-04-06T20:51:30.617Z"
+  },
+  {
+    "id": "stratechery-an-interview-with-asymco-s-horace-dediu-about-apple-at-50-https-stra",
+    "title": "An Interview with Asymco’s Horace Dediu About Apple at 50",
+    "url": "https://stratechery.com/2026/an-interview-with-asymcos-horace-dediu-about-apple-at-50/",
+    "source": "Stratechery",
+    "source_type": "analysis",
+    "published_at": "2026-04-02T10:00:00.000Z",
+    "raw_snippet": "An interview with Asymco's Horace Dediu about his career in tech, Apple's first 50 years, and the prospects for the next 50, particularly in the face of AI",
+    "created_at": "2026-04-06T20:51:30.527Z"
+  },
+  {
+    "id": "platformer-spotify-takes-on-its-doppelg-nger-problem-https-www-platformer-news-s",
+    "title": "Spotify takes on its doppelgänger problem",
+    "url": "https://www.platformer.news/spotify-artist-profile-protection/",
+    "source": "Platformer",
+    "source_type": "reporting",
+    "published_at": "2026-03-25T00:00:00.000Z",
+    "raw_snippet": "The company is taking new steps to stop AI impersonation — but across the internet, the problem continues to grow. PLUS: Anthropic in court, and Meta loses in New Mexico",
+    "created_at": "2026-04-06T20:51:30.625Z"
+  },
+  {
+    "id": "aws-machine-learning-blog-simulate-realistic-users-to-evaluate-multi-turn-ai-age",
+    "title": "Simulate realistic users to evaluate multi-turn AI agents in Strands Evals",
+    "url": "https://aws.amazon.com/blogs/machine-learning/simulate-realistic-users-to-evaluate-multi-turn-ai-agents-in-strands-evals/",
+    "source": "AWS Machine Learning Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-02T17:34:02.000Z",
+    "raw_snippet": "In this post, we explore how ActorSimulator in Strands Evaluations SDK addresses the challenge with structured user simulation that integrates into your evaluation pipeline.",
+    "created_at": "2026-04-06T20:51:30.580Z"
+  },
+  {
+    "id": "stratechery-axios-supply-chain-attack-claude-code-code-leaked-ai-and-security-ht",
+    "title": "Axios Supply Chain Attack, Claude Code Code Leaked, AI and Security",
+    "url": "https://stratechery.com/2026/axios-supply-chain-attack-claude-code-code-leaked-ai-and-security/",
+    "source": "Stratechery",
+    "source_type": "analysis",
+    "published_at": "2026-04-01T10:00:00.000Z",
+    "raw_snippet": "AI is going to be bad for security in the short-term, but much better than humans in the long-term.",
+    "created_at": "2026-04-06T20:51:30.527Z"
+  },
+  {
+    "id": "platformer-following-elon-tried-to-tank-twitter-https-www-platformer-news-elon-m",
+    "title": "Following: Elon tried to tank Twitter",
+    "url": "https://www.platformer.news/elon-musk-twitter-trial-defeat/",
+    "source": "Platformer",
+    "source_type": "reporting",
+    "published_at": "2026-03-24T00:00:15.000Z",
+    "raw_snippet": "PLUS: the White House's new AI agenda",
+    "created_at": "2026-04-06T20:51:30.625Z"
+  },
+  {
+    "id": "google-ai-blog-new-ways-to-balance-cost-and-reliability-in-the-gemini-api-https-",
+    "title": "New ways to balance cost and reliability in the Gemini API",
+    "url": "https://blog.google/innovation-and-ai/technology/developers-tools/introducing-flex-and-priority-inference/",
+    "source": "Google AI Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-02T16:00:00.000Z",
+    "raw_snippet": "Google is introducing two new inference tiers to the Gemini API, Flex and Priority, to balance cost and latency.",
+    "created_at": "2026-04-06T20:51:30.673Z"
+  },
+  {
+    "id": "stratechery-apple-s-50-years-of-integration-https-stratechery-com-2026-apples-50",
+    "title": "Apple’s 50 Years of Integration",
+    "url": "https://stratechery.com/2026/apples-50-years-of-integration/",
+    "source": "Stratechery",
+    "source_type": "analysis",
+    "published_at": "2026-03-31T10:00:00.000Z",
+    "raw_snippet": "Apple has survived 50 years by being the only company integrating hardware and software; if the company loses because of AI it will be because the point of integration changes.",
+    "created_at": "2026-04-06T20:51:30.527Z"
+  },
+  {
+    "id": "platformer-meta-s-new-support-bot-probably-can-t-get-you-your-account-back-https",
+    "title": "Meta's new support bot probably can't get you your account back",
+    "url": "https://www.platformer.news/meta-ai-support-bot-account-suspended/",
+    "source": "Platformer",
+    "source_type": "reporting",
+    "published_at": "2026-03-20T00:23:39.000Z",
+    "raw_snippet": "The company's new support chatbot is better than what came before — but still missing the one feature that millions are clamoring for",
+    "created_at": "2026-04-06T20:51:30.625Z"
+  },
+  {
+    "id": "google-ai-blog-create-edit-and-share-videos-at-no-cost-in-google-vids-https-blog",
+    "title": "Create, edit and share videos at no cost in Google Vids",
+    "url": "https://blog.google/products-and-platforms/products/workspace/google-vids-updates-lyria-veo/",
+    "source": "Google AI Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-02T16:00:00.000Z",
+    "raw_snippet": "New AI capabilities are coming to Google Vids, powered by Lyria 3 and Veo 3.1, like high-quality video generation at no cost and more.",
+    "created_at": "2026-04-06T20:51:30.673Z"
+  },
+  {
+    "id": "stratechery-an-interview-with-arm-ceo-rene-haas-about-selling-chips-https-strate",
+    "title": "An Interview with Arm CEO Rene Haas About Selling Chips",
+    "url": "https://stratechery.com/2026/an-interview-with-arm-ceo-rene-haas-about-selling-chips/",
+    "source": "Stratechery",
+    "source_type": "analysis",
+    "published_at": "2026-03-26T10:06:36.000Z",
+    "raw_snippet": "An interview with Arm CEO Rene Haas about the company's decision to not just license IP but make their own chips.",
+    "created_at": "2026-04-06T20:51:30.527Z"
+  },
+  {
+    "id": "openai-codex-now-offers-more-flexible-pricing-for-teams-https-openai-com-index-c",
+    "title": "Codex now offers more flexible pricing for teams",
+    "url": "https://openai.com/index/codex-flexible-pricing-for-teams",
+    "source": "OpenAI",
+    "source_type": "primary",
+    "published_at": "2026-04-02T10:00:00.000Z",
+    "raw_snippet": "Codex now includes pay-as-you-go pricing for ChatGPT Business and Enterprise, providing teams a more flexible option to start and scale adoption.",
+    "created_at": "2026-04-06T20:51:30.982Z"
+  },
+  {
+    "id": "benedict-evans-how-will-openai-compete-https-www-ben-evans-com-benedictevans-202",
+    "title": "How will OpenAI compete?",
+    "url": "https://www.ben-evans.com/benedictevans/2026/2/19/how-will-openai-compete-nkg2x",
+    "source": "Benedict Evans",
+    "source_type": "analysis",
+    "published_at": "2026-02-19T20:51:04.000Z",
+    "raw_snippet": "OpenAI has some big questions. It doesn’t have unique tech. It has a big user base, but with limited engagement and stickiness and no network effect. The incumbents have matched the tech and are leveraging their product and distribution. And a lot of the value and leverage will come from new experiences that haven’t been invented yet, and it can’t invent all of those itself. What’s the plan?",
+    "created_at": "2026-04-06T20:51:30.665Z"
+  },
+  {
+    "id": "hugging-face-blog-welcome-gemma-4-frontier-multimodal-intelligence-on-device-htt",
+    "title": "Welcome Gemma 4: Frontier multimodal intelligence on device",
+    "url": "https://huggingface.co/blog/gemma4",
+    "source": "Hugging Face Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-02T00:00:00.000Z",
+    "raw_snippet": "",
+    "created_at": "2026-04-06T20:51:30.553Z"
+  },
+  {
+    "id": "benedict-evans-ai-networks-and-mechanical-turks-https-www-ben-evans-com-benedict",
+    "title": "AI, networks and Mechanical Turks",
+    "url": "https://www.ben-evans.com/benedictevans/2025/11/23/ai-networks-and-mechanical-turks",
+    "source": "Benedict Evans",
+    "source_type": "analysis",
+    "published_at": "2025-11-23T13:14:03.000Z",
+    "raw_snippet": "How far do LLMs give us a step change in how good a search and recommendation system can be? Do they let you build one without needing a vast user base of your own?",
+    "created_at": "2026-04-06T20:51:30.665Z"
+  },
+  {
+    "id": "hugging-face-blog-holo3-breaking-the-computer-use-frontier-https-huggingface-co-",
+    "title": "Holo3: Breaking the Computer Use Frontier",
+    "url": "https://huggingface.co/blog/Hcompany/holo3",
+    "source": "Hugging Face Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-01T16:36:15.000Z",
+    "raw_snippet": "",
+    "created_at": "2026-04-06T20:51:30.553Z"
+  },
+  {
+    "id": "benedict-evans-what-kind-of-disruption-https-www-ben-evans-com-benedictevans-202",
+    "title": "What kind of disruption?",
+    "url": "https://www.ben-evans.com/benedictevans/2025/3/14/what-kind-of-disruption",
+    "source": "Benedict Evans",
+    "source_type": "analysis",
+    "published_at": "2025-03-14T16:31:21.000Z",
+    "raw_snippet": "Software ate the world. Uber and Airbnb didn’t sell software - they disrupted and redefined markets. But what kind of disruption are we talking about ?",
+    "created_at": "2026-04-06T20:51:30.665Z"
+  },
+  {
+    "id": "google-ai-blog-we-re-creating-a-new-satellite-imagery-map-to-help-protect-brazil",
+    "title": "We’re creating a new satellite imagery map to help protect Brazil’s forests.",
+    "url": "https://blog.google/products-and-platforms/products/earth/satellite-imagery-brazilian-deforestation/",
+    "source": "Google AI Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-01T13:30:00.000Z",
+    "raw_snippet": "Google partnered with the Brazilian government on a satellite imagery map to help protect the country’s forests.",
+    "created_at": "2026-04-06T20:51:30.673Z"
+  },
+  {
+    "id": "benedict-evans-apple-innovation-and-execution-https-www-ben-evans-com-benedictev",
+    "title": "Apple innovation and execution",
+    "url": "https://www.ben-evans.com/benedictevans/2025/3/13/apple-innovation-and-execution",
+    "source": "Benedict Evans",
+    "source_type": "analysis",
+    "published_at": "2025-03-14T01:46:16.000Z",
+    "raw_snippet": "It matters that Apple’s new Siri will be late, and it matters more that Apple didn’t realise. Is it more than that?",
+    "created_at": "2026-04-06T20:51:30.665Z"
+  },
+  {
+    "id": "google-ai-blog-the-latest-ai-news-we-announced-in-march-2026-https-blog-google-i",
+    "title": "The latest AI news we announced in March 2026",
+    "url": "https://blog.google/innovation-and-ai/technology/ai/google-ai-updates-march-2026/",
+    "source": "Google AI Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-01T13:00:00.000Z",
+    "raw_snippet": "Here are Google’s latest AI updates from March 2026",
+    "created_at": "2026-04-06T20:51:30.673Z"
+  },
+  {
+    "id": "benedict-evans-the-deep-research-problem-https-www-ben-evans-com-benedictevans-2",
+    "title": "The Deep Research problem",
+    "url": "https://www.ben-evans.com/benedictevans/2025/2/17/the-deep-research-problem",
+    "source": "Benedict Evans",
+    "source_type": "analysis",
+    "published_at": "2025-02-18T14:51:22.000Z",
+    "raw_snippet": "OpenAI’s Deep Research is built for me, and I can’t use it. It’s another amazing demo, until it breaks. But it breaks in really interesting ways.",
+    "created_at": "2026-04-06T20:51:30.665Z"
+  },
+  {
+    "id": "openai-gradient-labs-gives-every-bank-customer-an-ai-account-manager-https-opena",
+    "title": "Gradient Labs gives every bank customer an AI account manager",
+    "url": "https://openai.com/index/gradient-labs",
+    "source": "OpenAI",
+    "source_type": "primary",
+    "published_at": "2026-04-01T02:00:00.000Z",
+    "raw_snippet": "Gradient Labs uses GPT-4.1 and GPT-5.4 mini and nano to power AI agents that automate banking support workflows with low latency and high reliability.",
+    "created_at": "2026-04-06T20:51:30.982Z"
+  },
+  {
+    "id": "benedict-evans-are-better-models-better-https-www-ben-evans-com-benedictevans-20",
+    "title": "Are better models better?",
+    "url": "https://www.ben-evans.com/benedictevans/2025/1/the-problem-with-better-models",
+    "source": "Benedict Evans",
+    "source_type": "analysis",
+    "published_at": "2025-01-22T19:58:53.000Z",
+    "raw_snippet": "Every week there’s a better AI model that gives better answers. But a lot of questions don’t have better answers, only ‘right’ answers, and these models can’t do that. So what does ‘better’ mean, how do we manage these things, and should we change what we expect from computers?",
+    "created_at": "2026-04-06T20:51:30.665Z"
+  },
+  {
+    "id": "hugging-face-blog-any-custom-frontend-with-gradio-s-backend-https-huggingface-co",
+    "title": "Any Custom Frontend with Gradio's Backend",
+    "url": "https://huggingface.co/blog/introducing-gradio-server",
+    "source": "Hugging Face Blog",
+    "source_type": "primary",
+    "published_at": "2026-04-01T00:00:00.000Z",
+    "raw_snippet": "",
+    "created_at": "2026-04-06T20:51:30.553Z"
+  },
+  {
+    "id": "google-ai-blog-build-with-veo-3-1-lite-our-most-cost-effective-video-generation-",
+    "title": "Build with Veo 3.1 Lite, our most cost-effective video generation model",
+    "url": "https://blog.google/innovation-and-ai/technology/ai/veo-3-1-lite/",
+    "source": "Google AI Blog",
+    "source_type": "primary",
+    "published_at": "2026-03-31T16:00:00.000Z",
+    "raw_snippet": "Veo 3.1 Lite is now available in paid preview through the Gemini API and for testing in Google AI Studio.",
+    "created_at": "2026-04-06T20:51:30.673Z"
+  }
+]
