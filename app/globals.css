@@ -1570,3 +1570,73 @@ input:focus-visible {
     gap: 0.45rem;
   }
 }
+
+
+/* Editorial polish: preserve the established system while improving long-page rhythm. */
+.worth-headline {
+  font-size: clamp(1.38rem, 2.05vw, 1.78rem);
+  line-height: 1.1;
+}
+
+.latest-list {
+  gap: 0;
+}
+
+.latest-story {
+  padding-block: 1.85rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.latest-story:first-child {
+  border-top: 1px solid var(--rule-soft);
+}
+
+.latest-headline {
+  font-size: clamp(1.34rem, 2.15vw, 1.72rem);
+  line-height: 1.12;
+}
+
+.latest-story .story-summary {
+  max-width: 48rem;
+  color: var(--ink-muted);
+  font-size: 0.94rem;
+  line-height: 1.58;
+}
+
+.latest-story .latest-why {
+  color: var(--ink-faint);
+  font-size: 0.88rem;
+  line-height: 1.58;
+}
+
+.latest-column-headings > :last-child {
+  color: var(--accent);
+}
+
+.daily-signal-signup {
+  --daily-signal-band: #e7e3d8;
+}
+
+:root[data-theme="dark"] .daily-signal-signup {
+  --daily-signal-band: #302f29;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .daily-signal-signup {
+    --daily-signal-band: #302f29;
+  }
+}
+
+@media (max-width: 620px) {
+  .latest-story {
+    padding-block: 1.55rem;
+  }
+
+  .latest-headline {
+    font-size: clamp(1.28rem, 6.2vw, 1.62rem);
+  }
+
+  .latest-story .latest-why {
+    font-size: 0.9rem;
+  }
+}
