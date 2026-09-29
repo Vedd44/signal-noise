@@ -32,13 +32,13 @@ export function StoryCard({ story, variant, index }: StoryCardProps) {
           {String(index ?? 1).padStart(2, "0")}
         </span>
         <div className="compact-story-body">
-          <StoryMeta story={story} showScore />
+          <StoryMeta story={story} />
           <h3 className="compact-headline">
             <a className="story-link" href={story.url} target="_blank" rel="noopener noreferrer" aria-label={linkLabel}>
               {story.title}
             </a>
           </h3>
-          <p className="compact-summary">{story.summary}</p>
+          <p className="compact-summary compact-signal"><span>The Signal ›</span> {story.why_it_matters}</p>
         </div>
       </article>
     );
