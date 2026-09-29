@@ -110,7 +110,7 @@ test("email renderer produces editorial HTML, plain text, and direct publisher l
   assert.ok(selection);
   const rendered = renderDailySignalEmail(selection, SEND_DATE);
 
-  assert.equal(rendered.subject, "The Signal — September 4");
+  assert.equal(rendered.subject, "The Signal | September 4");
   assert.equal(rendered.preheader, "The stories worth knowing today.");
   assert.match(rendered.html, /THE LEAD/);
   assert.match(rendered.html, /WORTH KNOWING/);

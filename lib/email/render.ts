@@ -84,7 +84,13 @@ export function renderDailySignalEmail(
   unsubscribeUrl?: string
 ): RenderedDailySignalEmail {
   const localTime = getDailySignalLocalTime(sendDate);
-  const subject = `The Signal — ${localTime.subjectDate}`;
+  const subject = `The Signal | ${localTime.subjectDate}`;
+  const briefBullets = [selection.lead, ...selection.worthKnowing, ...selection.onRadar]
+    .slice(0, 5)
+    .map((story) => story.summary);
+  const briefHtml = briefBullets
+    .map((bullet) => `<li style="margin:0 0 9px;padding-left:3px;">${escapeHtml(bullet)}</li>`)
+    .join("");
   const worthKnowingHtml = selection.worthKnowing
     .map((story) => renderFeaturedStory(story, false, "worth"))
     .join("");
@@ -126,6 +132,11 @@ export function renderDailySignalEmail(
                 <p class="metadata" style="margin:15px 0 4px;color:#938d83;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;line-height:1.5;text-transform:uppercase;">${escapeHtml(localTime.displayDate)}</p>
                 <p class="summary" style="margin:0 0 34px;color:#bbb4a8;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;">${PREHEADER}</p>
 
+                <div class="section-rule" style="padding:20px 0 22px;border-top:1px solid #48463f;">
+                  <p style="margin:0 0 14px;color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">TODAY IN BRIEF</p>
+                  <ul style="margin:0;padding:0 0 0 19px;color:#bbb4a8;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;">${briefHtml}</ul>
+                </div>
+
                 <div class="section-rule" style="padding-top:20px;border-top:1px solid #48463f;">
                   <p style="margin:0 0 18px;color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">THE LEAD</p>
                   ${renderFeaturedStory(selection.lead, true, "lead")}
@@ -159,6 +170,9 @@ export function renderDailySignalEmail(
     "SIGNAL > NOISE",
     localTime.displayDate,
     PREHEADER,
+    "",
+    "TODAY IN BRIEF",
+    ...briefBullets.map((bullet) => `• ${bullet}`),
     "",
     "THE LEAD",
     renderPlainStory(selection.lead, true),

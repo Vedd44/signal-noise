@@ -12,6 +12,7 @@ import {
   runIngestionPipeline,
   writeNormalizedStories
 } from "@/lib/pipeline/ingest";
+import { hasEnoughEvidence, hydrateStorySource } from "@/lib/pipeline/sourceContent";
 
 loadLocalEnv();
 
@@ -50,78 +51,57 @@ type RunFullPipelineOptions = {
 
 export async function runFullPipeline(options?: RunFullPipelineOptions) {
   const writeDebugFiles = options?.writeDebugFiles ?? false;
-
   console.log("[pipeline] start");
 
-  console.log("[pipeline] ingestion start");
   const ingestion = await runIngestionPipeline();
   const sourceFailures = ingestion.sourceResults
     .filter((result) => result.error)
-    .map((result) => ({
-      source: result.source.name,
-      error: result.error ?? "Unknown error"
-    }));
+    .map((result) => ({ source: result.source.name, error: result.error ?? "Unknown error" }));
   const ingestionNonEnglishRejected = ingestion.sourceResults.reduce(
-    (total, result) => total + result.nonEnglishRejectedCount,
-    0
+    (total, result) => total + result.nonEnglishRejectedCount, 0
   );
 
-  console.log("[pipeline] ingestion complete");
-  printIngestionSummary(ingestion.stories, ingestion.sourceResults, {
-    includeStoryDetails: false
-  });
+  printIngestionSummary(ingestion.stories, ingestion.sourceResults, { includeStoryDetails: false });
+  if (writeDebugFiles) await writeNormalizedStories(ingestion.stories);
 
-  if (writeDebugFiles) {
-    await writeNormalizedStories(ingestion.stories);
-  }
-
-  console.log("[pipeline] existing-story check start");
   const existingStoryFilter = await filterExistingStories(ingestion.stories);
+  console.log(`[pipeline] existing-story check complete: skipped ${existingStoryFilter.alreadyExistingCount}`);
+
+  console.log("[pipeline] source retrieval start");
+  const sourceHydrated = await Promise.all(
+    existingStoryFilter.storiesToEnrich.map((story) => hydrateStorySource(story))
+  );
+  const evidenceRejected = sourceHydrated.filter((story) => !hasEnoughEvidence(story));
+  const storiesWithEvidence = sourceHydrated.filter(hasEnoughEvidence);
   console.log(
-    `[pipeline] existing-story check complete: skipped ${existingStoryFilter.alreadyExistingCount}`
+    `[pipeline] source retrieval complete: full source ${sourceHydrated.filter((story) => story.source_fetch_status === "full-source").length}, fallback ${sourceHydrated.filter((story) => story.source_fetch_status !== "full-source").length}, rejected ${evidenceRejected.length}`
   );
 
-  console.log("[pipeline] enrichment start");
-  const enrichment = await runEnrichmentPipeline(existingStoryFilter.storiesToEnrich, {
+  const enrichment = await runEnrichmentPipeline(storiesWithEvidence, {
     batchSize: options?.batchSize
   });
-  console.log("[pipeline] enrichment complete");
 
-  console.log("[pipeline] upsert start");
   const upsert = await upsertStories(enrichment.enrichedStories);
+  if (writeDebugFiles) await writeEnrichedStories(enrichment.enrichedStories);
 
-  if (writeDebugFiles) {
-    await writeEnrichedStories(enrichment.enrichedStories);
-  }
-
-  console.log(
-    `[pipeline] upsert complete: inserted ${upsert.insertedCount}, updated ${upsert.updatedCount}`
-  );
-
-  console.log("[pipeline] cleanup start");
   const cleanup = await cleanupOldStories();
-  console.log(
-    `[pipeline] cleanup complete: deleted ${cleanup.deletedCount}, cutoff ${cleanup.cutoffTimestamp}`
-  );
-
-  console.log("[pipeline] source inventory cap start");
   const sourceInventoryCleanup = await enforcePublishedSourceInventoryCap();
-  console.log(
-    `[pipeline] source inventory cap complete: deleted ${sourceInventoryCleanup.deletedCount}`
-  );
+  const evidenceSkips = evidenceRejected.map((story) => ({
+    title: story.title,
+    reason: `insufficient source evidence (${story.source_fetch_status ?? "feed-only"})`
+  }));
+  const skippedEnrichment = [...evidenceSkips, ...enrichment.skippedStories];
 
   const result = {
     success: true,
     candidatesDiscovered: ingestion.stories.length,
     alreadyExistingSkipped: existingStoryFilter.alreadyExistingCount,
     nonEnglishRejected:
-      ingestionNonEnglishRejected +
-      enrichment.nonEnglishRejectedCount +
-      upsert.nonEnglishRejectedCount,
+      ingestionNonEnglishRejected + enrichment.nonEnglishRejectedCount + upsert.nonEnglishRejectedCount,
     sentToAI: enrichment.submittedCount,
     processedCount: ingestion.stories.length,
     enrichedCount: enrichment.enrichedStories.length,
-    rejectedCount: enrichment.skippedStories.length,
+    rejectedCount: skippedEnrichment.length,
     writtenCount: upsert.insertedCount + upsert.updatedCount,
     insertedCount: upsert.insertedCount,
     updatedCount: upsert.updatedCount,
@@ -130,23 +110,18 @@ export async function runFullPipeline(options?: RunFullPipelineOptions) {
     sourceCapDeletedCount: sourceInventoryCleanup.deletedCount,
     retentionCutoff: cleanup.cutoffTimestamp,
     sourceFailures,
-    skippedEnrichment: enrichment.skippedStories,
+    skippedEnrichment,
     aiUsage: enrichment.aiUsage
   } satisfies FullPipelineResult;
 
-  console.log(
-    "[pipeline.metrics]",
-    JSON.stringify({
-      candidatesDiscovered: result.candidatesDiscovered,
-      alreadyExistingSkipped: result.alreadyExistingSkipped,
-      nonEnglishRejected: result.nonEnglishRejected,
-      sentToAI: result.sentToAI,
-      enriched: result.enrichedCount,
-      rejected: result.rejectedCount,
-      written: result.writtenCount,
-      ai: result.aiUsage
-    })
-  );
-
+  console.log("[pipeline.metrics]", JSON.stringify({
+    candidatesDiscovered: result.candidatesDiscovered,
+    alreadyExistingSkipped: result.alreadyExistingSkipped,
+    sentToAI: result.sentToAI,
+    enriched: result.enrichedCount,
+    rejected: result.rejectedCount,
+    written: result.writtenCount,
+    ai: result.aiUsage
+  }));
   return result;
 }
