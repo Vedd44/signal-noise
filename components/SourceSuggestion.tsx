@@ -22,7 +22,7 @@ export function SourceSuggestion() {
     const endpoint = open === "source" ? "/api/suggest-source" : "/api/feature-request";
     const body = open === "source"
       ? { name: form.get("name"), url: form.get("url"), reason: form.get("reason"), company: form.get("company") }
-      : { request: form.get("request"), details: form.get("details"), company: form.get("company") };
+      : { request: form.get("request"), company: form.get("company") };
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -56,7 +56,6 @@ export function SourceSuggestion() {
           ) : (
             <>
               <label>What should we add or improve?<textarea name="request" required maxLength={1000} rows={3} /></label>
-              <label>Anything else? <span>(optional)</span><textarea name="details" maxLength={1000} rows={3} /></label>
             </>
           )}
           <input className="source-honeypot" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" />
