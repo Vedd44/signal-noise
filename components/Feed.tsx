@@ -5,6 +5,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { StoryCard } from "@/components/StoryCard";
 import { DailySignalSignup } from "@/components/DailySignalSignup";
 import { ThemeControl } from "@/components/ThemeControl";
+import { SourceSuggestion } from "@/components/SourceSuggestion";
 import { organizeBriefingStories } from "@/lib/briefing";
 import type { PublicStoryTopic, Story } from "@/types/story";
 import { formatRelativeTime } from "@/lib/utils";
@@ -292,6 +293,8 @@ export function Feed({ stories, lastRefreshedAt }: FeedProps) {
           </div>
         </div>
       )}
+
+      <SourceSuggestion />
 
       {isAutoScrolling ? (
         <button
