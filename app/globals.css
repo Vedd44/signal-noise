@@ -1703,3 +1703,24 @@ input:focus-visible {
     border-left: 2px solid var(--accent);
   }
 }
+
+
+/* Compact view is the fast Signal-first reading mode. */
+.compact-story .story-score {
+  display: none;
+}
+
+.compact-signal {
+  color: var(--ink);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.compact-signal > span {
+  color: var(--accent);
+  font-family: var(--technical);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
