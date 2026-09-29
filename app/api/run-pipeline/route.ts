@@ -4,38 +4,36 @@ import { runFullPipeline } from "@/lib/pipeline/run";
 
 export const dynamic = "force-dynamic";
 
-function getAuthorizationSecrets() {
-  const secrets = [
-    process.env.PIPELINE_SECRET,
-    process.env.CRON_SECRET
-  ].filter((value): value is string => Boolean(value));
+function getTriggerType(request: NextRequest) {
+  const manualSecret = process.env.PIPELINE_SECRET;
+  const cronSecret = process.env.CRON_SECRET;
 
-  if (secrets.length === 0) {
-    throw new Error(
-      "Missing PIPELINE_SECRET or CRON_SECRET in environment variables"
-    );
+  if (!manualSecret && !cronSecret) {
+    throw new Error("Missing PIPELINE_SECRET or CRON_SECRET in environment variables");
   }
 
-  return Array.from(new Set(secrets));
-}
-
-function isAuthorized(request: NextRequest) {
-  const authorizationSecrets = getAuthorizationSecrets();
-  const manualSecret = process.env.PIPELINE_SECRET;
   const authHeader = request.headers.get("authorization");
   const headerSecret = request.headers.get("x-pipeline-secret");
-  const querySecret = request.nextUrl.searchParams.get("secret");
 
-  return (
-    authorizationSecrets.some((secret) => authHeader === `Bearer ${secret}`) ||
-    (Boolean(manualSecret) &&
-      (headerSecret === manualSecret || querySecret === manualSecret))
-  );
+  if (cronSecret && authHeader === `Bearer ${cronSecret}`) {
+    return "vercel-cron";
+  }
+
+  if (
+    manualSecret &&
+    (authHeader === `Bearer ${manualSecret}` || headerSecret === manualSecret)
+  ) {
+    return "manual";
+  }
+
+  return null;
 }
 
 async function handleRequest(request: NextRequest) {
   try {
-    if (!isAuthorized(request)) {
+    const triggerType = getTriggerType(request);
+
+    if (!triggerType) {
       return NextResponse.json(
         {
           success: false,
@@ -45,22 +43,50 @@ async function handleRequest(request: NextRequest) {
       );
     }
 
+    if (triggerType === "manual") {
+      console.log("[pipeline] manual trigger");
+    } else {
+      console.log("[pipeline] vercel cron trigger");
+    }
+
     const result = await runFullPipeline();
 
     return NextResponse.json(result);
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
+    console.error(
+      "[pipeline] fatal",
+      JSON.stringify({ event: "pipeline_failed", error: message })
+    );
 
     return NextResponse.json(
       {
         success: false,
         error: message,
+        candidatesDiscovered: 0,
+        alreadyExistingSkipped: 0,
+        nonEnglishRejected: 0,
+        sentToAI: 0,
         processedCount: 0,
         enrichedCount: 0,
+        rejectedCount: 0,
+        writtenCount: 0,
         insertedCount: 0,
         updatedCount: 0,
+        deletedCount: 0,
+        retentionDeletedCount: 0,
+        sourceCapDeletedCount: 0,
+        retentionCutoff: new Date(0).toISOString(),
         sourceFailures: [],
-        skippedEnrichment: []
+        skippedEnrichment: [],
+        aiUsage: {
+          model: process.env.OPENAI_MODEL ?? "gpt-6-luna",
+          requestCount: 0,
+          inputTokens: 0,
+          outputTokens: 0,
+          totalLatencyMs: 0,
+          retryCount: 0
+        }
       },
       { status: 500 }
     );

@@ -5,5 +5,8 @@ dist
 .env
 .env.local
 coverage
+tmp/
 *.log
 tsconfig.tsbuildinfo
+.vercel
+.DS_Store

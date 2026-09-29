@@ -16,7 +16,8 @@ async function main() {
   console.log(".env.local loaded for local scripts");
   console.log(`Enriching ${normalizedStories.slice(0, 12).length} stories...\n`);
 
-  const { enrichedStories, skippedStories } = await runEnrichmentPipeline(normalizedStories);
+  const { enrichedStories, skippedStories, aiUsage } =
+    await runEnrichmentPipeline(normalizedStories);
 
   skippedStories.forEach(({ title, reason }) => {
     console.warn(`- Skipped ${title} (${reason})`);
@@ -26,6 +27,7 @@ async function main() {
 
   await writeEnrichedStories(enrichedStories);
   printEnrichmentSummary(enrichedStories);
+  console.log("[ai.usage]", JSON.stringify(aiUsage));
 
   console.log(`Upserted ${insertedCount} inserted and ${updatedCount} updated stories to Supabase`);
   console.log(`Saved ${enrichedStories.length} enriched stories to ${enrichedStoriesOutputPath}`);

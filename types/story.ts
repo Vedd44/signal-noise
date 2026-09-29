@@ -1,13 +1,21 @@
 export type StorySourceType = "primary" | "reporting" | "analysis";
 
 export type StoryTag =
-  | "Platform Move"
-  | "Narrative Shift"
-  | "Product Signal"
-  | "Business Move"
-  | "Media Signal"
-  | "Audience Trend"
-  | "PR Signal";
+  | "AI"
+  | "Product"
+  | "Media"
+  | "Strategy"
+  | "Business"
+  | "Consumer Tech";
+
+export type PublicStoryTopic =
+  | "All"
+  | "AI"
+  | "Media"
+  | "Strategy"
+  | "Product"
+  | "Business"
+  | "Consumer Tech";
 
 export type Story = {
   // Stable identifier for the story across ingest, storage, and rendering.
@@ -34,6 +42,7 @@ export type Story = {
   raw_snippet?: string;
   // Timestamp for when the story record was created in Signal > Noise.
   created_at: string;
+  updated_at: string;
   // Optional flag for standout stories that deserve extra emphasis later.
   is_top_signal?: boolean;
   // Publishing status for storage and workflow control.
@@ -59,6 +68,9 @@ export type NormalizedStory = {
   published_at: string;
   // Raw excerpt from the feed before editorial enrichment.
   raw_snippet: string;
+  // Optional language metadata supplied by the feed or individual feed item.
+  feed_language?: string;
+  item_language?: string;
   // Timestamp for when Signal > Noise normalized the item locally.
   created_at: string;
 };
