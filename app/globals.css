@@ -1724,3 +1724,15 @@ input:focus-visible {
   letter-spacing: 0.075em;
   text-transform: uppercase;
 }
+
+
+/* Compact mode shows the complete Signal; these takes are intentionally concise. */
+.compact-summary.compact-signal {
+  display: block;
+  overflow: visible;
+  -webkit-box-orient: initial;
+  -webkit-line-clamp: unset;
+  line-clamp: unset;
+  text-overflow: clip;
+  white-space: normal;
+}
