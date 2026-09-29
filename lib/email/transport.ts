@@ -22,17 +22,14 @@ export type DailySignalTransport = {
 
 function getRequiredEnvironmentValue(name: string) {
   const value = process.env[name]?.trim();
-
-  if (!value) {
-    throw new Error(`Missing ${name} in environment variables`);
-  }
-
+  if (!value) throw new Error(`Missing ${name} in environment variables`);
   return value;
 }
 
 export function formatSignalBriefFrom(value: string) {
-  const addressMatch = value.match(/<([^>]+)>\\s*$/);
-  const address = addressMatch?.[1]?.trim() || value.trim();
+  const start = value.lastIndexOf("<");
+  const end = value.lastIndexOf(">");
+  const address = start >= 0 && end > start ? value.slice(start + 1, end).trim() : value.trim();
   return `Signal Brief <${address}>`;
 }
 
@@ -46,7 +43,6 @@ export function getDailySignalEmailConfig(): DailySignalEmailConfig {
 
 export function createResendTransport(apiKey: string): DailySignalTransport {
   const resend = new Resend(apiKey);
-
   return {
     async send(message) {
       const { data, error } = await resend.emails.send(
@@ -58,15 +54,9 @@ export function createResendTransport(apiKey: string): DailySignalTransport {
           text: message.text,
           tags: [{ name: "briefing", value: "daily-signal" }]
         },
-        {
-          idempotencyKey: message.idempotencyKey
-        }
+        { idempotencyKey: message.idempotencyKey }
       );
-
-      if (error || !data?.id) {
-        throw new Error(error?.message ?? "Resend did not return a message ID");
-      }
-
+      if (error || !data?.id) throw new Error(error?.message ?? "Resend did not return a message ID");
       return { id: data.id };
     }
   };
