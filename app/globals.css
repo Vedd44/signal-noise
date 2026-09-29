@@ -1462,3 +1462,111 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+
+.source-suggestion {
+  margin-top: 5rem;
+  padding: 1.25rem 0 3rem;
+  border-top: 1px solid var(--rule-soft);
+}
+
+.source-suggestion-links {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--ink-muted);
+  font-family: var(--technical);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.source-suggestion-links a,
+.source-suggestion-links button {
+  border: 0;
+  padding: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.source-suggestion-links a:hover,
+.source-suggestion-links button:hover {
+  color: var(--accent);
+}
+
+.source-suggestion-form {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 36rem);
+  margin-top: 1.5rem;
+}
+
+.source-suggestion-form label {
+  display: grid;
+  gap: 0.4rem;
+  color: var(--ink-muted);
+  font-family: var(--technical);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.source-suggestion-form label span {
+  color: var(--ink-faint);
+  font-weight: 500;
+}
+
+.source-suggestion-form input,
+.source-suggestion-form textarea {
+  width: 100%;
+  border: 1px solid var(--ink-muted);
+  border-radius: 0;
+  padding: 0.7rem 0.75rem;
+  background: var(--background);
+  color: var(--ink);
+  font: 0.95rem/1.4 var(--sans);
+  text-transform: none;
+}
+
+.source-suggestion-form button {
+  justify-self: start;
+  border: 1px solid var(--accent);
+  padding: 0.65rem 0.9rem;
+  background: var(--accent);
+  color: var(--accent-ink);
+  font-family: var(--technical);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.source-suggestion-form p {
+  margin: 0;
+  color: var(--ink-muted);
+  font-size: 0.85rem;
+}
+
+.source-honeypot {
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+@media (max-width: 620px) {
+  .source-suggestion {
+    margin-top: 3.75rem;
+  }
+
+  .source-suggestion-links {
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+}
