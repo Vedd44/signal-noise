@@ -1,4 +1,4 @@
-import Script from "next/script";
+import { Analytics } from "@/components/Analytics";
 import type { Metadata, Viewport } from "next";
 
 import {
@@ -67,7 +67,6 @@ export const viewport: Viewport = {
   ]
 };
 
-const GA_TRACKING_ID = "G-Z489P9ZBC1";
 
 export default function RootLayout({
   children
@@ -76,22 +75,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head>
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`}
-          strategy="afterInteractive"
-        />
-        <Script id="gtag-init" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', '${GA_TRACKING_ID}');
-          `}
-        </Script>
-      </head>
-      <body>{children}</body>
+      <body><a className="skip-link" href="#main-content">Skip to content</a>{children}<Analytics /></body>
     </html>
   );
 }

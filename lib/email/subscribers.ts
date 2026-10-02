@@ -1,4 +1,4 @@
-import { createHash, createHmac, timingSafeEqual } from "node:crypto";
+import { createHmac, timingSafeEqual } from "node:crypto";
 
 import { getSupabaseServiceClient } from "@/lib/db";
 
@@ -8,32 +8,17 @@ export type DailySignalSubscriber = {
 };
 
 export type DailySignalSubscriberStore = {
-  subscribe(email: string, now: string): Promise<void>;
   listActive(): Promise<DailySignalSubscriber[]>;
   unsubscribe(id: string, now: string): Promise<void>;
 };
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const EMAIL_PATTERN = /^[a-z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+$/;
 
 export function normalizeSubscriberEmail(value: unknown) {
   if (typeof value !== "string") return null;
   const email = value.trim().toLowerCase();
-  return email.length <= 254 && EMAIL_PATTERN.test(email) ? email : null;
-}
-
-export function subscriberLogId(email: string) {
-  return createHash("sha256").update(email).digest("hex").slice(0, 12);
-}
-
-export async function subscribeToDailySignal(
-  value: unknown,
-  store: DailySignalSubscriberStore,
-  now = new Date().toISOString()
-) {
-  const email = normalizeSubscriberEmail(value);
-  if (!email) return { success: false as const, reason: "invalid-email" as const };
-  await store.subscribe(email, now);
-  return { success: true as const, email };
+  const local = email.split("@")[0];
+  return email.length <= 254 && local.length <= 64 && !local.startsWith(".") && !local.endsWith(".") && !local.includes("..") && EMAIL_PATTERN.test(email) ? email : null;
 }
 
 export async function unsubscribeFromDailySignal(
@@ -52,60 +37,23 @@ export function createSupabaseSubscriberStore(): DailySignalSubscriberStore {
   const supabase = getSupabaseServiceClient();
 
   return {
-    async subscribe(email, now) {
-      const existing = await supabase
-        .from("daily_signal_subscribers")
-        .select("id, status")
-        .eq("email", email)
-        .maybeSingle();
-
-      if (existing.error) throw new Error(existing.error.message);
-      if (existing.data?.status === "active") return;
-
-      if (existing.data) {
-        const reactivated = await supabase
-          .from("daily_signal_subscribers")
-          .update({ status: "active", subscribed_at: now, unsubscribed_at: null, updated_at: now })
-          .eq("id", existing.data.id);
-        if (reactivated.error) throw new Error(reactivated.error.message);
-        return;
-      }
-
-      const inserted = await supabase.from("daily_signal_subscribers").insert({
-        email,
-        status: "active",
-        subscribed_at: now,
-        updated_at: now
-      });
-
-      // A concurrent request may have inserted the same normalized address.
-      if (inserted.error?.code === "23505") {
-        const reactivated = await supabase
-          .from("daily_signal_subscribers")
-          .update({ status: "active", subscribed_at: now, unsubscribed_at: null, updated_at: now })
-          .eq("email", email)
-          .eq("status", "unsubscribed");
-        if (reactivated.error) throw new Error(reactivated.error.message);
-        return;
-      }
-      if (inserted.error) throw new Error(inserted.error.message);
-    },
-
     async listActive() {
-      const result = await supabase
-        .from("daily_signal_subscribers")
-        .select("id, email")
-        .eq("status", "active");
-      if (result.error) throw new Error(result.error.message);
-      return (result.data ?? []) as DailySignalSubscriber[];
+      const subscribers: DailySignalSubscriber[] = [];
+      for (let offset = 0; ; offset += 500) {
+        const result = await supabase.from("daily_signal_subscribers").select("id, email")
+          .eq("status", "active").order("id").range(offset, offset + 499);
+        if (result.error) throw new Error("Subscriber list unavailable");
+        subscribers.push(...(result.data ?? []) as DailySignalSubscriber[]);
+        if ((result.data?.length ?? 0) < 500) return subscribers;
+      }
     },
 
     async unsubscribe(id, now) {
       const result = await supabase
         .from("daily_signal_subscribers")
-        .update({ status: "unsubscribed", unsubscribed_at: now, updated_at: now })
+        .update({ status: "unsubscribed", unsubscribed_at: now, updated_at: now, confirmation_token_hash: null, confirmation_expires_at: null, confirmation_requested_at: null })
         .eq("id", id)
-        .eq("status", "active");
+        .in("status", ["active", "pending"]);
       if (result.error) throw new Error(result.error.message);
     }
   };

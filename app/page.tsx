@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { Feed } from "@/components/Feed";
 import { Header } from "@/components/Header";
 import { getPublishedStories } from "@/lib/data";
@@ -26,8 +27,13 @@ const structuredData = {
   ]
 };
 
+const readBriefing = unstable_cache(() => getPublishedStories({throwOnError:true}), ['published-briefing-v2'], {revalidate:60});
 export default async function HomePage() {
-  const { stories, lastRefreshedAt } = await getPublishedStories();
+  let inventory: Awaited<ReturnType<typeof getPublishedStories>>;
+  let unavailable = false;
+  try { inventory = await readBriefing(); }
+  catch { inventory = {stories:[],lastRefreshedAt:null}; unavailable = true; }
+  const { stories, lastRefreshedAt } = inventory;
 
   return (
     <>
@@ -37,9 +43,9 @@ export default async function HomePage() {
           __html: JSON.stringify(structuredData).replace(/</g, "\\u003c")
         }}
       />
-      <main className="page-shell">
+      <main id="main-content" className="page-shell">
         <Header />
-        <Feed stories={stories} lastRefreshedAt={lastRefreshedAt} />
+        <Feed stories={stories} lastRefreshedAt={lastRefreshedAt} unavailable={unavailable} />
       </main>
     </>
   );

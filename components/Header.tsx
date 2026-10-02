@@ -7,7 +7,7 @@ export function Header() {
         </h1>
         <div className="masthead-aside">
           <p className="masthead-summary">
-            An opinionated briefing on the stories worth your attention.
+            The stories worth knowing. The Signal explains why they matter.
           </p>
           <a className="masthead-daily-signal" href="#daily-signal">Get the Daily Signal</a>
         </div>

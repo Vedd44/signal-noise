@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { track } from "@/lib/analytics";
 
 type FormKind = "feature" | "source";
 type Status = "idle" | "sending" | "sent" | "error";
@@ -16,7 +17,8 @@ export function SourceSuggestion() {
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!open) return;
+    if (!open || status === "sending") return;
+    const formElement = event.currentTarget;
     setStatus("sending");
     const form = new FormData(event.currentTarget);
     const endpoint = open === "source" ? "/api/suggest-source" : "/api/feature-request";
@@ -24,29 +26,32 @@ export function SourceSuggestion() {
       ? { name: form.get("name"), url: form.get("url"), reason: form.get("reason"), company: form.get("company") }
       : { request: form.get("request"), company: form.get("company") };
 
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    setStatus(response.ok ? "sent" : "error");
-    if (response.ok) event.currentTarget.reset();
+    try {
+      const response = await fetch(endpoint, {
+        method: "POST", headers: { "content-type": "application/json" },
+        body: JSON.stringify(body), signal: AbortSignal.timeout(15_000)
+      });
+      setStatus(response.ok ? "sent" : "error");
+      if (response.ok) { formElement.reset(); track(open === "source" ? "source_request" : "feature_request"); }
+    } catch { setStatus("error"); }
   }
 
   return (
-    <section className="source-suggestion" aria-label="Feedback">
+    <section id="feedback" className="source-suggestion" aria-label="Feedback">
       <div className="source-suggestion-links">
-        <button type="button" onClick={() => toggle("feature")} aria-expanded={open === "feature"}>
+        <button type="button" disabled={status === "sending"} onClick={() => toggle("feature")} aria-expanded={open === "feature"}>
           Submit a feature request
         </button>
         <span aria-hidden="true">·</span>
-        <button type="button" onClick={() => toggle("source")} aria-expanded={open === "source"}>
+        <button type="button" disabled={status === "sending"} onClick={() => toggle("source")} aria-expanded={open === "source"}>
           Suggest a source
         </button>
+        <span aria-hidden="true">·</span><a href="/privacy">Privacy</a>
       </div>
 
       {open ? (
-        <form className="source-suggestion-form" onSubmit={submit}>
+        <form key={open} className="source-suggestion-form" onSubmit={submit} aria-busy={status === "sending"}>
+          <fieldset disabled={status === "sending"}>
           {open === "source" ? (
             <>
               <label>Source name<input name="name" required maxLength={120} /></label>
@@ -62,8 +67,9 @@ export function SourceSuggestion() {
           <button type="submit" disabled={status === "sending"}>
             {status === "sending" ? "Sending…" : open === "source" ? "Send suggestion" : "Send request"}
           </button>
-          {status === "sent" ? <p>Thanks. We’ll take a look.</p> : null}
-          {status === "error" ? <p>Couldn’t send that right now. Try again.</p> : null}
+          </fieldset>
+          {status === "sent" ? <p role="status">Thanks. We’ll take a look.</p> : null}
+          {status === "error" ? <p role="alert">Couldn’t send that right now. Try again.</p> : null}
         </form>
       ) : null}
     </section>

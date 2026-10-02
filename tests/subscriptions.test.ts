@@ -9,7 +9,6 @@ import { evaluateExistingDailySignalClaim } from "@/lib/email/send-log";
 import {
   createUnsubscribeToken,
   normalizeSubscriberEmail,
-  subscribeToDailySignal,
   unsubscribeFromDailySignal,
   verifyUnsubscribeToken,
   type DailySignalSubscriberStore
@@ -49,11 +48,6 @@ const stories = Array.from({ length: 10 }, (_, index) => story(index));
 function memorySubscriberStore(initial: Array<{ id: string; email: string; status: "active" | "unsubscribed" }> = []) {
   const rows = [...initial];
   const store: DailySignalSubscriberStore = {
-    async subscribe(email) {
-      const existing = rows.find((row) => row.email === email);
-      if (existing) existing.status = "active";
-      else rows.push({ id: OTHER_ID, email, status: "active" });
-    },
     async listActive() {
       return rows.filter((row) => row.status === "active").map(({ id, email }) => ({ id, email }));
     },
@@ -65,22 +59,10 @@ function memorySubscriberStore(initial: Array<{ id: string; email: string; statu
   return { rows, store };
 }
 
-test("signup validates and normalizes email without duplicating an active subscriber", async () => {
-  const memory = memorySubscriberStore();
+test("signup normalizes email consistently before database confirmation claims", () => {
   assert.equal(normalizeSubscriberEmail("  PERSON@Example.COM "), "person@example.com");
+  assert.equal(normalizeSubscriberEmail("person@example.com"), "person@example.com");
   assert.equal(normalizeSubscriberEmail("not-an-email"), null);
-  assert.deepEqual(await subscribeToDailySignal("bad", memory.store), { success: false, reason: "invalid-email" });
-  await subscribeToDailySignal("  PERSON@Example.COM ", memory.store);
-  await subscribeToDailySignal("person@example.com", memory.store);
-  assert.equal(memory.rows.length, 1);
-  assert.equal(memory.rows[0].email, "person@example.com");
-});
-
-test("an unsubscribed address can safely reactivate", async () => {
-  const memory = memorySubscriberStore([{ id: ACTIVE_ID, email: "person@example.com", status: "unsubscribed" }]);
-  await subscribeToDailySignal("PERSON@example.com", memory.store);
-  assert.equal(memory.rows[0].status, "active");
-  assert.equal(memory.rows.length, 1);
 });
 
 test("signed unsubscribe is valid, tamper-resistant, successful, and repeat-safe", async () => {
@@ -114,8 +96,8 @@ test("subscriber form preserves accessible markup, approved copy, success, and s
   assert.match(component, /aria-describedby="daily-signal-support daily-signal-error"/);
   assert.match(component, /aria-live="polite"/);
   assert.match(component, /The signal, before the noise\./);
-  assert.match(component, /You’re in\./);
-  assert.match(component, /Your first Daily Signal will arrive tomorrow morning\./);
+  assert.match(component, /Check your inbox\./);
+  assert.match(component, /Confirm your email/);
 });
 
 test("daily delivery preserves owner, includes only active subscribers, dedupes owner, and isolates addresses", async () => {

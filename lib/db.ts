@@ -15,6 +15,7 @@ export function getSupabaseReadClient() {
     getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
     getRequiredEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
     {
+      global: { fetch: (url, init) => fetch(url, { ...init, signal: init?.signal ?? AbortSignal.timeout(10_000) }) },
       auth: {
         persistSession: false,
         autoRefreshToken: false
@@ -28,6 +29,7 @@ export function getSupabaseServiceClient() {
     getRequiredEnv("NEXT_PUBLIC_SUPABASE_URL"),
     getRequiredEnv("SUPABASE_SERVICE_ROLE_KEY"),
     {
+      global: { fetch: (url, init) => fetch(url, { ...init, signal: init?.signal ?? AbortSignal.timeout(10_000) }) },
       auth: {
         persistSession: false,
         autoRefreshToken: false

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
+import { track } from "@/lib/analytics";
 import { StoryCard } from "@/components/StoryCard";
 import { DailySignalSignup } from "@/components/DailySignalSignup";
 import { ThemeControl } from "@/components/ThemeControl";
@@ -27,9 +28,10 @@ const TOPICS: PublicStoryTopic[] = [
 type FeedProps = {
   stories: Story[];
   lastRefreshedAt: string | null;
+  unavailable?: boolean;
 };
 
-export function Feed({ stories, lastRefreshedAt }: FeedProps) {
+export function Feed({ stories, lastRefreshedAt, unavailable = false }: FeedProps) {
   const [view, setView] = useState<FeedView>("list");
   const [topic, setTopic] = useState<PublicStoryTopic>("All");
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
@@ -154,14 +156,17 @@ export function Feed({ stories, lastRefreshedAt }: FeedProps) {
   };
 
   return (
-    <section className="briefing" aria-labelledby="briefing-title">
+    <section className="briefing" aria-labelledby="briefing-title" onClick={(event) => {
+      const link = (event.target as HTMLElement).closest<HTMLAnchorElement>("a.story-link");
+      if (link) track("story_click", {view});
+    }}>
       <div className="briefing-bar">
         <div className="briefing-heading">
           <h2 id="briefing-title" className="section-label briefing-title">
             Today&apos;s briefing
           </h2>
           <p className="briefing-updated">
-            {stories.length} stories · Updated {lastUpdated}
+            {stories.length ? `${stories.length} stories · Updated ${lastUpdated}` : "The briefing will be back shortly"}
           </p>
         </div>
 
@@ -182,7 +187,7 @@ export function Feed({ stories, lastRefreshedAt }: FeedProps) {
               type="button"
               className={view === "list" ? "view-toggle-button is-active" : "view-toggle-button"}
               aria-pressed={view === "list"}
-              onClick={() => setView("list")}
+              onClick={() => { setView("list"); track("view_change", {view:"list"}); }}
             >
               List
             </button>
@@ -190,7 +195,7 @@ export function Feed({ stories, lastRefreshedAt }: FeedProps) {
               type="button"
               className={view === "compact" ? "view-toggle-button is-active" : "view-toggle-button"}
               aria-pressed={view === "compact"}
-              onClick={() => setView("compact")}
+              onClick={() => { setView("compact"); track("view_change", {view:"compact"}); }}
             >
               Compact
             </button>
@@ -203,9 +208,9 @@ export function Feed({ stories, lastRefreshedAt }: FeedProps) {
       {!leadStory ? (
         <>
           <div className="feed-empty-state">
-            <p className="feed-empty-title">No stories are live right now.</p>
+            <p className="feed-empty-title">{unavailable ? "The briefing couldn’t load." : "No stories are live right now."}</p>
             <p className="feed-empty-copy">
-              The next briefing is on its way. Check back shortly for fresh signal.
+              {unavailable ? "Please refresh in a moment. Your subscriptions are unaffected." : "The next briefing is on its way. Check back shortly for fresh signal."}
             </p>
           </div>
           <DailySignalSignup />
