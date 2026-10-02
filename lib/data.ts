@@ -1,10 +1,12 @@
+import { publicHttpUrl } from "@/lib/urls";
+import { dedupeStories } from "@/lib/dedupe";
 import { getSupabaseReadClient } from "@/lib/db";
 import { normalizeExternalText } from "@/lib/pipeline/cleanText";
 import { evaluateStoryEditorialFit, normalizeStoryTag } from "@/lib/scoring";
 import { orderStoriesForFeed } from "@/lib/utils";
 import type { Story } from "@/types/story";
 
-function normalizeStory(value: unknown): Story | null {
+export function normalizeStory(value: unknown): Story | null {
   if (!value || typeof value !== "object") {
     return null;
   }
@@ -15,18 +17,18 @@ function normalizeStory(value: unknown): Story | null {
 
   if (
     typeof story.id === "string" &&
-    typeof story.title === "string" &&
-    typeof story.url === "string" &&
+    typeof story.title === "string" && story.title.trim().length > 0 &&
+    typeof story.url === "string" && publicHttpUrl(story.url) !== null &&
     typeof story.source === "string" &&
     (story.source_type === "primary" ||
       story.source_type === "reporting" ||
       story.source_type === "analysis") &&
     typeof story.published_at === "string" &&
     !Number.isNaN(Date.parse(story.published_at)) &&
-    typeof story.summary === "string" &&
-    typeof story.why_it_matters === "string" &&
+    typeof story.summary === "string" && story.summary.trim().length > 0 &&
+    typeof story.why_it_matters === "string" && story.why_it_matters.trim().length > 0 &&
     normalizedTag &&
-    typeof story.score === "number" &&
+    typeof story.score === "number" && Number.isFinite(story.score) &&
     typeof story.created_at === "string" &&
     typeof story.updated_at === "string"
   ) {
@@ -78,6 +80,8 @@ export async function getPublishedStories(options?: { throwOnError?: boolean }):
         "id, title, url, source, source_type, published_at, summary, why_it_matters, tag, score, raw_snippet, image_url, read_time, is_top_signal, status, created_at, updated_at"
       )
       .eq("status", "published")
+      .gte("published_at", new Date(Date.now()-72*3600_000).toISOString())
+      .lte("published_at", new Date(Date.now()+5*60_000).toISOString())
       .order("published_at", { ascending: false });
 
     if (error) {
@@ -131,7 +135,7 @@ export async function getPublishedStories(options?: { throwOnError?: boolean }):
     }, null);
 
     return {
-      stories: orderStoriesForFeed(stories),
+      stories: dedupeStories(orderStoriesForFeed(stories)),
       lastRefreshedAt
     };
   } catch (error) {

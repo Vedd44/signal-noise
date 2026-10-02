@@ -1,3 +1,5 @@
+import { publicHttpUrl } from "@/lib/urls";
+import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -10,7 +12,6 @@ import {
   isTechnicalNicheStory
 } from "@/lib/scoring";
 import {
-  createStoryId,
   isValidIsoDate,
   sortByPublishedAtDesc,
   truncateText
@@ -232,15 +233,15 @@ function normalizeItem(
   feedLanguage?: string
 ): NormalizedStory | null {
   const title = normalizeExternalText(item.title ?? "", { stripHtml: true });
-  const url = item.link?.trim() ?? "";
+  const url = publicHttpUrl(item.link?.trim() ?? "");
   const published_at = normalizePublishedAt(item);
 
-  if (!title || !url || !published_at) {
+  if (!title || !url || !published_at || Date.parse(published_at) > Date.now()+5*60_000 || Date.parse(published_at) < Date.now()-72*3600_000) {
     return null;
   }
 
   return {
-    id: createStoryId(source.name, title, url),
+    id: `${source.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")}-${createHash("sha256").update(url).digest("hex").slice(0,24)}`,
     title,
     url,
     source: source.name,

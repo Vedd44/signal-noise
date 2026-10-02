@@ -6,6 +6,7 @@ import {
   runDailySignal
 } from "@/lib/email/daily-signal";
 
+export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 async function handleRequest(request: NextRequest) {
@@ -24,8 +25,13 @@ async function handleRequest(request: NextRequest) {
     });
   }
 
-  const result = await runDailySignal({ enforceSendWindow: trigger === "vercel-cron" });
-  return NextResponse.json(result, { status: getDailySignalHttpStatus(result) });
+  try {
+    const result = await runDailySignal({ enforceSendWindow: trigger === "vercel-cron" });
+    return NextResponse.json(result, { status: getDailySignalHttpStatus(result) });
+  } catch {
+    console.error("[daily-signal] unexpected failure");
+    return NextResponse.json({success:false,error:"Daily Signal unavailable"}, {status:503});
+  }
 }
 
 export async function GET(request: NextRequest) {

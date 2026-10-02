@@ -1,7 +1,7 @@
 export const DAILY_SIGNAL_TIME_ZONE = "America/New_York";
 export const DAILY_SIGNAL_SEND_HOUR = 8;
 export const DAILY_SIGNAL_SEND_MINUTE = 10;
-export const DAILY_SIGNAL_SEND_WINDOW_MINUTES = 10;
+export const DAILY_SIGNAL_SEND_WINDOW_MINUTES = 30;
 
 export type DailySignalLocalTime = {
   localDate: string;

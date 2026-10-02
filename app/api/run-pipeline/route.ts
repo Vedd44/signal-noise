@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { runFullPipeline } from "@/lib/pipeline/run";
+import { runTrackedPipeline } from "@/lib/pipeline/run";
 
+export const maxDuration = 300;
 export const dynamic = "force-dynamic";
 
 function getTriggerType(request: NextRequest) {
@@ -49,7 +50,7 @@ async function handleRequest(request: NextRequest) {
       console.log("[pipeline] vercel cron trigger");
     }
 
-    const result = await runFullPipeline();
+    const result = await runTrackedPipeline();
 
     return NextResponse.json(result);
   } catch (error) {
@@ -62,7 +63,7 @@ async function handleRequest(request: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        error: message,
+        error: "Pipeline failed; inspect private execution logs",
         candidatesDiscovered: 0,
         alreadyExistingSkipped: 0,
         nonEnglishRejected: 0,

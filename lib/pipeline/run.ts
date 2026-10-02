@@ -1,3 +1,6 @@
+import { getSupabaseServiceClient } from "@/lib/db";
+import { retrySubmissionNotifications } from "@/lib/submissions";
+import { mapConcurrent } from "@/lib/pipeline/concurrency";
 import { loadLocalEnv } from "@/lib/env";
 import {
   cleanupOldStories,
@@ -54,6 +57,7 @@ export async function runFullPipeline(options?: RunFullPipelineOptions) {
   console.log("[pipeline] start");
 
   const ingestion = await runIngestionPipeline();
+  if (ingestion.sourceResults.every(result => result.error)) throw new Error('All ingestion sources failed');
   const sourceFailures = ingestion.sourceResults
     .filter((result) => result.error)
     .map((result) => ({ source: result.source.name, error: result.error ?? "Unknown error" }));
@@ -68,9 +72,7 @@ export async function runFullPipeline(options?: RunFullPipelineOptions) {
   console.log(`[pipeline] existing-story check complete: skipped ${existingStoryFilter.alreadyExistingCount}`);
 
   console.log("[pipeline] source retrieval start");
-  const sourceHydrated = await Promise.all(
-    existingStoryFilter.storiesToEnrich.map((story) => hydrateStorySource(story))
-  );
+  const sourceHydrated = await mapConcurrent(existingStoryFilter.storiesToEnrich, 5, hydrateStorySource);
   const evidenceRejected = sourceHydrated.filter((story) => !hasEnoughEvidence(story));
   const storiesWithEvidence = sourceHydrated.filter(hasEnoughEvidence);
   console.log(
@@ -81,6 +83,7 @@ export async function runFullPipeline(options?: RunFullPipelineOptions) {
     batchSize: options?.batchSize
   });
 
+  if (enrichment.submittedCount > 0 && enrichment.enrichedStories.length === 0) throw new Error('All editorial generations failed validation or transport');
   const upsert = await upsertStories(enrichment.enrichedStories);
   if (writeDebugFiles) await writeEnrichedStories(enrichment.enrichedStories);
 
@@ -124,4 +127,25 @@ export async function runFullPipeline(options?: RunFullPipelineOptions) {
     ai: result.aiUsage
   }));
   return result;
+}
+
+/** Durable overlap prevention and a small operational history, with no source text or secrets. */
+export async function runTrackedPipeline() {
+  const db = getSupabaseServiceClient();
+  const claim = await db.rpc('claim_pipeline_run');
+  if (claim.error) throw new Error('Pipeline claim unavailable');
+  if (!claim.data) return {success:true,status:'already-running'};
+  try {
+    const result = await runFullPipeline();
+    const { error } = await db.from('pipeline_runs').update({ status:'succeeded', completed_at:new Date().toISOString(), metrics:{
+      candidates:result.candidatesDiscovered,written:result.writtenCount,rejected:result.rejectedCount,
+      sourceFailures:result.sourceFailures.map(f=>f.source), ai:result.aiUsage
+    }}).eq('id',claim.data);
+    if (error) throw new Error('Pipeline run recording failed');
+    try { await retrySubmissionNotifications(); } catch { console.error('[pipeline] reader notifications pending'); }
+    return result;
+  } catch(error) {
+    await db.from('pipeline_runs').update({status:'failed',completed_at:new Date().toISOString()}).eq('id',claim.data);
+    throw error;
+  }
 }

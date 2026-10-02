@@ -2,6 +2,8 @@ import he from "he";
 
 import { normalizeExternalText } from "@/lib/pipeline/cleanText";
 import type { NormalizedStory } from "@/types/story";
+import { rssSources } from "@/lib/feeds";
+import { publicHttpUrl } from "@/lib/urls";
 
 const SOURCE_FETCH_TIMEOUT_MS = 10_000;
 const MAX_SOURCE_TEXT_LENGTH = 12_000;
@@ -13,6 +15,7 @@ function stripNonContent(html: string) {
     .replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, " ")
     .replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, " ")
     .replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, " ")
+    .replace(/<(nav|header|footer|aside|form|select)\b[^>]*>[\s\S]*?<\/\1>/gi, " ")
     .replace(/<!--([\s\S]*?)-->/g, " ");
 }
 
@@ -28,15 +31,26 @@ function extractJsonLdArticleBody(html: string) {
           if (typeof candidate?.articleBody === "string") return candidate.articleBody;
         }
       }
-    } catch {}
+    } catch { /* Publishers sometimes emit malformed JSON-LD; use their article element instead. */ }
   }
   return "";
 }
 
 function extractPrimaryHtml(html: string) {
+  const body = html.match(/<div\b[^>]*(?:id|class)=["'][^"']*\b(?:tns-post-body-content|entry-content|article-body|post-content)\b[^"']*["'][^>]*>/i);
+  if (body?.index !== undefined) {
+    const start = body.index + body[0].length;
+    const tags = /<\/?div\b[^>]*>/gi;
+    tags.lastIndex = start;
+    let depth = 1;
+    for (let tag = tags.exec(html); tag; tag = tags.exec(html)) {
+      depth += tag[0].startsWith('</') ? -1 : 1;
+      if (depth === 0) return html.slice(start, tag.index);
+    }
+  }
   return html.match(/<article\b[^>]*>([\s\S]*?)<\/article>/i)?.[1]
     || html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)?.[1]
-    || html;
+    || ""; // Navigation and subscription forms are not article evidence.
 }
 
 export function extractReadableSourceText(html: string) {
@@ -56,14 +70,35 @@ export async function hydrateStorySource(story: NormalizedStory): Promise<Normal
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), SOURCE_FETCH_TIMEOUT_MS);
   try {
-    const response = await fetch(story.url, {
+    const publisher = rssSources.find(source => source.name === story.source);
+    const host = publisher ? new URL(publisher.rss_url).hostname.replace(/^www\./, '') : '';
+    const parts = host.split('.');
+    const base = parts.slice(host.endsWith('.co.uk') ? -3 : -2).join('.');
+    const permitted = (value: string) => {
+      const safe = publicHttpUrl(value);
+      if (!safe || !base) return false;
+      const url = new URL(safe);
+      return url.protocol === 'https:' && (!url.port || url.port === '443') && (url.hostname === base || url.hostname.endsWith(`.${base}`));
+    };
+    let url = story.url;
+    let response: Response | undefined;
+    for (let redirect = 0; redirect < 4; redirect++) {
+      if (!permitted(url)) return { ...story, source_fetch_status: 'untrusted-source-url' };
+      response = await fetch(url, {
       headers: {
         "user-agent": "SignalBrief/1.0",
         accept: "text/html,application/xhtml+xml"
       },
-      redirect: "follow",
+      redirect: "manual",
       signal: controller.signal
-    });
+      });
+      if (response.status < 300 || response.status >= 400) break;
+      const location = response.headers.get('location');
+      await response.body?.cancel();
+      if (!location) break;
+      url = new URL(location, url).href;
+    }
+    if (!response) return { ...story, source_fetch_status: 'fetch-failed' };
     if (!response.ok) return { ...story, source_fetch_status: `http-${response.status}` };
 
     const contentType = response.headers.get("content-type") ?? "";
@@ -71,7 +106,18 @@ export async function hydrateStorySource(story: NormalizedStory): Promise<Normal
       return { ...story, source_fetch_status: "unsupported-content-type" };
     }
 
-    const sourceText = extractReadableSourceText(await response.text());
+    const reader = response.body?.getReader();
+    if (!reader) return { ...story, source_fetch_status: 'empty-body' };
+    const chunks: Uint8Array[] = [];
+    let bytes = 0;
+    while (true) {
+      const part = await reader.read();
+      if (part.done) break;
+      bytes += part.value.byteLength;
+      if (bytes > 2_000_000) { await reader.cancel(); return { ...story, source_fetch_status: 'source-too-large' }; }
+      chunks.push(part.value);
+    }
+    const sourceText = extractReadableSourceText(Buffer.concat(chunks).toString('utf8'));
     if (sourceText.length < MIN_USEFUL_SOURCE_TEXT_LENGTH) {
       return { ...story, source_fetch_status: "insufficient-source-text" };
     }

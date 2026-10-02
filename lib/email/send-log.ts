@@ -1,3 +1,4 @@
+import type { DailySignalSelection } from "@/lib/email/selection";
 import { getSupabaseServiceClient } from "@/lib/db";
 
 export type DailySignalClaimResult =
@@ -8,7 +9,8 @@ export type DailySignalClaimResult =
     };
 
 export type DailySignalSendLog = {
-  claim(localDate: string, contentHash: string, attemptedAt: string): Promise<DailySignalClaimResult>;
+  loadSelection?(localDate: string): Promise<DailySignalSelection | null>;
+  claim(localDate: string, contentHash: string, attemptedAt: string, selection?: DailySignalSelection): Promise<DailySignalClaimResult>;
   markSent(localDate: string, providerMessageId: string, sentAt: string): Promise<void>;
   markFailed(localDate: string, failedAt: string): Promise<void>;
 };
@@ -31,10 +33,6 @@ export function evaluateExistingDailySignalClaim(
     return "already-sent";
   }
 
-  if (existing.status === "failed") {
-    return "reclaim";
-  }
-
   if (existing.content_hash !== contentHash) {
     return "payload-changed";
   }
@@ -43,7 +41,7 @@ export function evaluateExistingDailySignalClaim(
   const currentTime = Date.parse(attemptedAt);
   const ageMinutes = (currentTime - attemptedTime) / (1000 * 60);
 
-  return ageMinutes >= STALE_SEND_MINUTES &&
+  return (existing.status === "failed" || ageMinutes >= STALE_SEND_MINUTES) &&
     ageMinutes <= RESEND_IDEMPOTENCY_HOURS * 60
     ? "reclaim"
     : "in-progress";
@@ -53,11 +51,17 @@ export function createSupabaseDailySignalSendLog(): DailySignalSendLog {
   const supabase = getSupabaseServiceClient();
 
   return {
-    async claim(localDate, contentHash, attemptedAt) {
+    async loadSelection(localDate) {
+      const result = await supabase.from("daily_signal_sends").select("selection_snapshot").eq("local_date",localDate).maybeSingle();
+      if (result.error) throw new Error("Campaign snapshot unavailable");
+      return (result.data?.selection_snapshot as DailySignalSelection) ?? null;
+    },
+    async claim(localDate, contentHash, attemptedAt, selection) {
       const inserted = await supabase
         .from("daily_signal_sends")
         .insert({
           local_date: localDate,
+          selection_snapshot: selection ?? null,
           status: "sending",
           content_hash: contentHash,
           attempted_at: attemptedAt,

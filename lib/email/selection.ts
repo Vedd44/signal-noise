@@ -1,3 +1,5 @@
+import { dedupeStories } from "@/lib/dedupe";
+import { publicHttpUrl } from "@/lib/urls";
 import { organizeBriefingStories } from "@/lib/briefing";
 import { orderStoriesForFeed } from "@/lib/utils";
 import type { Story } from "@/types/story";
@@ -20,14 +22,19 @@ export function selectDailySignalStories(
   stories: Story[],
   now = Date.now()
 ): DailySignalSelection | null {
-  if (stories.length === 0) {
+  stories = dedupeStories(stories.filter(story => {
+    const published = Date.parse(story.published_at);
+    return Number.isFinite(published) && published <= now+5*60_000 && now-published <= 72*3600_000 &&
+      publicHttpUrl(story.url) && story.summary.trim() && story.why_it_matters.trim();
+  }));
+  if (stories.length < 4 || !stories.some(story => now-Date.parse(story.published_at) <= 24*3600_000)) {
     return null;
   }
 
   const rankedStories = orderStoriesForFeed(stories, now);
   const { leadStory, worthKnowingStories } = organizeBriefingStories(rankedStories, "All");
 
-  if (!leadStory) {
+  if (!leadStory || worthKnowingStories.length < 3) {
     return null;
   }
 

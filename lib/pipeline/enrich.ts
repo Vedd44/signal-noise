@@ -1,3 +1,4 @@
+import { mapConcurrent } from "@/lib/pipeline/concurrency";
 import fs from "node:fs/promises";
 import path from "node:path";
 
@@ -542,6 +543,8 @@ export async function enrichStoryForModel(
         error instanceof Error ? error.message : "response was not valid JSON";
 
       if (!receivedResponse) {
+        const status = error && typeof error === 'object' && 'status' in error ? Number(error.status) : 0;
+        if (attempt + 1 < MAX_ENRICHMENT_ATTEMPTS && (!status || status === 429 || status >= 500)) continue;
         return {
           enrichment: null,
           attempts: attempt + 1,
@@ -609,7 +612,7 @@ export async function runEnrichmentPipeline(
 
   const client = getOpenAIClient();
 
-  for (const story of batch) {
+  await mapConcurrent(batch, 3, async (story) => {
     try {
       const result = await enrichStoryForModel(client, story, model);
       addAiUsage(aiUsage, result.usage);
@@ -622,7 +625,7 @@ export async function runEnrichmentPipeline(
           title: story.title,
           reason: result.reason
         });
-        continue;
+        return;
       }
 
       enriched.push({
@@ -645,8 +648,10 @@ export async function runEnrichmentPipeline(
         reason
       });
     }
-  }
+  });
 
+  const originalOrder = new Map(batch.map((story, index) => [story.id, index]));
+  enriched.sort((a, b) => originalOrder.get(a.id)! - originalOrder.get(b.id)!);
   return {
     enrichedStories: diversifyStoryScores(enriched),
     skippedStories,

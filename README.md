@@ -1,307 +1,95 @@
-# Signal > Noise
+# Signal Brief
 
-Signal > Noise is a clean, editorial-style feed of high-signal stories across AI, media, and digital strategy. The project is intentionally small and local-first, but it now includes the core content pipeline: RSS ingestion, AI enrichment, Supabase storage, and a secured automation route.
+Signal Brief is an editorial news briefing at https://www.signalbrief.xyz/. Each story pairs a concise summary with **The Signal**: the useful takeaway explaining why it matters. The existing list and compact reading modes share ranked, source-diversified stories with the daily email.
 
-## Stack
+## Development
 
-- Next.js App Router
-- TypeScript
-- React
-
-## Getting Started
-
-1. Install dependencies:
-
-```bash
-npm install
-```
-
-2. Start the local dev server:
-
-```bash
+```sh
+npm ci
 npm run dev
 ```
 
-3. Open `http://localhost:3000`
+Open http://localhost:3000. `npm test`, `npm run lint`, `npm run typecheck`, and `npm run build` are the release checks. Tests use fake transports and never send email. `npm run start` serves the production build. Production-only email and AI credentials are not required for UI development.
 
-## Environment Variables
+## Configuration
 
-Create a `.env.local` file in the project root with:
+Keep `.env.local`, Vercel credentials, and provider keys out of Git. Configure production values in Vercel:
 
-```bash
-OPENAI_API_KEY=your_api_key_here
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
-PIPELINE_SECRET=your_long_random_secret
-CRON_SECRET=your_vercel_cron_secret
-RESEND_API_KEY=your_resend_sending_key
-DAILY_SIGNAL_RECIPIENT=owner@example.com
-DAILY_SIGNAL_FROM=Signal > Noise <briefing@your_verified_domain>
-DAILY_SIGNAL_ENABLED=false
-DAILY_SIGNAL_UNSUBSCRIBE_SECRET=your_random_secret_of_at_least_32_characters
-```
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public read-only story access, protected by RLS |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-only database access |
+| `OPENAI_API_KEY` | Server-only enrichment |
+| `OPENAI_MODEL` | Optional override; default `gpt-6-luna` |
+| `PIPELINE_SECRET`, `CRON_SECRET` | Manual automation / Vercel cron authorization |
+| `RESEND_API_KEY`, `DAILY_SIGNAL_FROM` | Server-only verified email transport; displayed sender name is Signal Brief |
+| `DAILY_SIGNAL_RECIPIENT` | Private owner copy and reader submission notification address |
+| `DAILY_SIGNAL_UNSUBSCRIBE_SECRET` | Stable secret of at least 32 characters for signed unsubscribe links |
+| `DAILY_SIGNAL_ENABLED` | `true` enables scheduled email; false/unset disables scheduled sending |
 
-This key is used only for the local enrichment step and should remain server-side only.
-Restart the dev server or any running scripts after adding or changing `.env.local`.
-Local scripts such as `npm run ingest` and `npm run enrich` also load `.env.local` directly.
-Keep `SUPABASE_SERVICE_ROLE_KEY` server-side only.
-Keep `PIPELINE_SECRET` server-side only.
-For Vercel Cron, also set `CRON_SECRET` in the Vercel project settings. The simplest setup is to give `CRON_SECRET` the same value as `PIPELINE_SECRET`.
-`RESEND_API_KEY`, `DAILY_SIGNAL_RECIPIENT`, `DAILY_SIGNAL_FROM`, and `DAILY_SIGNAL_UNSUBSCRIBE_SECRET` are server-side only.
-Leave `DAILY_SIGNAL_ENABLED=false` or unset until the Daily Signal test email and sending domain have been confirmed.
+Never use a `NEXT_PUBLIC_` variable for the owner address or service credentials. Reply-To is not separately configured; replies use the verified From address. Keep the unsubscribe signing secret stable so existing links continue working.
 
-## Available Scripts
+## Database
 
-- `npm run dev` starts the local app
-- `npm run build` creates a production build
-- `npm run start` serves the production build
-- `npm run lint` runs ESLint
-- `npm run typecheck` runs TypeScript checks
-- `npm run test:daily-signal` validates email selection, rendering, authorization, scheduling, duplicate protection, and failures without sending email
-- `npm run ingest` fetches and normalizes local RSS stories
-- `npm run enrich` enriches normalized stories with AI and writes local JSON output
+For a fresh project, apply `supabase/schema.sql`, then **`supabase/launch-readiness.sql`**. For the existing production project, the launch migration is additive and preserves subscribers and stories. It was applied on October 2, 2026. `daily-signal-public-launch.sql` is the historical subscriber rollout, not the final security configuration.
 
-## Local Ingestion
+- `stories`: anonymous SELECT for published rows only; no public writes.
+- `daily_signal_subscribers`: private pending/active/unsubscribed lifecycle, hashed confirmation tokens, confirmation timestamps, and allowlisted campaign attribution.
+- `daily_signal_sends`, `daily_signal_deliveries`: private campaign snapshots and per-recipient send claims.
+- `reader_submissions`: private, durable feature/source feedback with notification status.
+- `public_request_limits`: private expiring HMAC identifiers and atomic request counters.
+- `pipeline_runs`: private run locks, status, counts, and timing. Thirty-day retention.
 
-Run the RSS ingestion pipeline locally with:
+All new functions revoke public/anon/authenticated execution and grant service-role execution only. Run `supabase/launch-readiness-checks.sql` **inside a transaction that rolls back**; it exercises confirmation, expiry, resubscription, rate limits, and permissions using disposable fixtures. Do not run it as an autocommitting production script.
 
-```bash
-npm run ingest
-```
+## Content pipeline
 
-The script fetches all configured RSS feeds, normalizes recent entries into a shared pre-enrichment shape, prints a readable summary in the terminal, and writes the full result set to `data/normalized-stories.json`.
+Vercel calls `/api/run-pipeline` every six hours at 00:00, 06:00, 12:00, and 18:00 UTC. The route accepts Vercel `Authorization: Bearer $CRON_SECRET` or manual `PIPELINE_SECRET` authorization.
 
-## Local Enrichment
+1. Fetch the 12 RSS sources in `lib/feeds.ts` and reject malformed, future, or stale records.
+2. Skip unchanged stored URLs before paid AI calls, retaining existing IDs.
+3. Retrieve article evidence with bounded timeouts, size limits, publisher host checks, and five-way concurrency. Remove navigation/forms and find actual article bodies; otherwise use the RSS evidence.
+4. Generate structured summary, Signal, category, and score with GPT-6 Luna, three-way concurrency, 20-second requests, and at most two attempts. Source text is untrusted evidence, not instructions. Invalid outputs do not publish fallback copy.
+5. Upsert, retain published stories for 72 hours, and cap each source at six stories. Rank/diversify consistently across the feed and email. Conservative URL/event/roundup deduplication hides repeats without deleting stored records.
 
-Run the enrichment pipeline locally with:
+A private database claim prevents overlapping runs. All-source or all-generation failures report errors. Per-source failures and enrichment counts appear in run metrics. Pending feedback notifications are retried after ingestion. The route has a five-minute execution limit; abandoned claims recover after six minutes.
 
-```bash
-npm run enrich
-```
+The homepage caches successful database reads for 60 seconds and displays a distinct unavailable state on database failure. AI is only called during ingestion or explicit evaluations, never per visitor. The text-only presentation is intentional.
 
-The enrichment script loads `.env.local` before running, so restart any running processes after updating that file.
+Local `npm run ingest` and `npm run enrich` scripts are operational tools: enrichment makes paid calls and writes to the configured Supabase project. `npm run model-eval` makes paid comparisons and saves ignored local results without writing stories. Review the configured destinations before running these tools.
 
-Optional environment variables:
+## Subscriber lifecycle and forms
 
-- `OPENAI_MODEL` overrides the default `gpt-5.6-terra` model used for enrichment
-- `ENRICH_BATCH_SIZE` limits how many normalized stories are processed in one run
+Signup validates email, same-origin JSON, payload size, honeypot, and durable IP/address limits. It creates a pending record and sends a 24-hour confirmation link. Only an explicit confirmation POST activates a subscription; link-scanner GET requests cannot subscribe anyone. Repeated pending requests have a five-minute cooldown, and active addresses receive the same generic public response without another email. Existing active subscribers stay active.
 
-The script reads `data/normalized-stories.json`, generates `summary`, `why_it_matters`, `tag`, and `score`, prints a readable terminal summary, and writes the enriched output to `data/enriched-stories.json`.
+Confirmation stores only token hashes. Unsubscribing clears pending confirmation state. Subscribers can sign up again, but must reconfirm. Signed unsubscribe links remain account-free and repeat-safe; mailbox providers can use RFC 8058 one-click POST headers. Token pages have no analytics, no indexing, and no referrer disclosure.
 
-## Local Content Flow
+Source suggestions and feature requests are stored before owner notification. Identical submissions within a ten-minute bucket are deduplicated. Provider failures leave a private pending row; ingestion retries recent notifications within Resend's idempotency window. Inspect older unnotified rows manually rather than blindly resending after 24 hours.
 
-1. Run `npm run ingest`
-2. Run `npm run enrich`
-3. Run `npm run dev` and open the homepage to view the latest stories from Supabase
+## Daily email operation
 
-The enrichment step keeps a local debug file in `data/enriched-stories.json`, upserts stories into Supabase, and the homepage reads published stories from Supabase. If Supabase has no stories yet, the app renders a clean empty state instead of crashing.
+The email uses the lead, three Worth Knowing stories, and up to six On the Radar items. The lead must be within 24 hours, all stories within 72 hours, and four valid stories must be available. Missing or stale inventory returns 503 without claiming or sending an incomplete issue.
 
-## Supabase
+Vercel calls `/api/daily-signal` at **12:10, 12:30, 13:10, and 13:30 UTC**. An `America/New_York` gate allows only 8:10–8:39 AM local time: 8:10 is the normal delivery and 8:30 is recovery, across DST. The existing 8:10 timing remains intentional, after the 12:00 UTC ingestion run in daylight time.
 
-Apply the schema in `supabase/schema.sql` to your Supabase project before running enrichment.
+The first attempt saves the entire selected issue. Retries reuse it, skip recorded deliveries, and keep provider request keys stable. Changed payloads and ambiguous attempts outside the provider idempotency window are not automatically resent. Emails are sent one recipient at a time with bounded requests and pacing. No recipient list is exposed in To or CC. Large lists can exceed the five-minute function budget; inspect partial campaign counts and plan a queue before scaling to thousands of subscribers.
 
-Stories are stored in the `stories` table and read back through the shared freshness-adjusted, source-diversified feed ordering.
-The homepage reads with the anon key, so RLS should allow public read-only access to rows where `status = 'published'`.
+**Manual POST `/api/daily-signal` sends a real campaign to all eligible recipients, even when scheduled sending is disabled. It is not a single-recipient test endpoint.** Do not use it for smoke tests.
 
-The schema also contains private `daily_signal_sends`, `daily_signal_deliveries`, and `daily_signal_subscribers` tables. RLS is enabled without public subscriber or delivery policies; server-side service-role code is the only application access path. Apply the latest `supabase/schema.sql` before testing Daily Signal signup or sends.
+For a no-send HTML preview, use `/api/daily-signal/preview` in development; it returns 404 in production. Render fixtures directly through `lib/email/render.ts` for production-build visual tests. The owner copy intentionally has no unsubscribe link.
 
-For the production public-signup launch, run `supabase/daily-signal-public-launch.sql`. It creates only the subscriber/delivery objects and their shared timestamp trigger dependency; it does not alter stories or the existing `daily_signal_sends` table.
+## Launch measurement and privacy
 
-## Automated Pipeline
+GA4 (`G-Z489P9ZBC1`) loads only on the production homepage and respects Do Not Track. It records page views, 30-second visible engagement, signup started/submitted, source and feature requests, outbound story clicks, and list/compact changes. Analytics location/referrer values are sanitized; emails and bearer tokens are never event properties.
 
-The secured server-side route is:
+Allowlisted UTM labels persist for the browser session and are saved on pending subscriber records. Confirmed conversions are available by `confirmed_at` and `attribution` in the private database; no analytics script runs on confirmation links. In GA4, review event arrival and mark `signup_submitted` as a key event. Evaluate confirmed subscriber counts alongside submissions, which also include repeat addresses. Do not export subscriber addresses to ad platforms.
 
-```text
-/api/run-pipeline
-```
+The public privacy page describes these services and links to the feedback form. Production pages provide canonical/social metadata; confirmation, unsubscribe, and 404 states are excluded from indexing. Security headers cover framing, MIME sniffing, referrers, and unneeded device permissions.
 
-Pass the secret with either:
+## Deployment and incident checks
 
-- `Authorization: Bearer $PIPELINE_SECRET`
-- `x-pipeline-secret: $PIPELINE_SECRET`
+GitHub `main` deploys to Vercel production. Always confirm the deployment's SHA and READY status, inspect build logs, and smoke-test the production alias after pushing.
 
-The route runs the full pipeline:
+For a failed run, inspect Vercel function logs and private `pipeline_runs` / campaign delivery counts. Test unauthorized automation calls, malformed public submissions, and public RLS without triggering a campaign. Provider dashboards are still needed to verify actual inbox receipt, suppression, domain reputation, and GA event arrival. Do not print secrets or subscriber addresses in logs or incident reports.
 
-1. fetch RSS sources
-2. normalize stories
-3. enrich stories
-4. upsert into Supabase
-
-It returns JSON with success state, processed counts, insert/update counts, and any source failures.
-
-Vercel Cron is configured in [vercel.json](/Users/jonnyhpl/Desktop/signal-noise/vercel.json) to hit the route every 6 hours:
-
-```json
-{
-  "crons": [
-    {
-      "path": "/api/run-pipeline",
-      "schedule": "0 */6 * * *"
-    }
-  ]
-}
-```
-
-Vercel Cron runs in UTC, so this fires at `00:00`, `06:00`, `12:00`, and `18:00` UTC. On Vercel, cron-triggered requests arrive as `Authorization: Bearer $CRON_SECRET`, and the route also continues to support manual triggering with `PIPELINE_SECRET`.
-
-The pipeline checks candidate URLs and IDs in Supabase before enrichment. Unchanged existing stories are skipped without an OpenAI request; changed content on an existing URL is re-enriched while retaining the stored ID.
-
-### Source roster and inventory health
-
-The production RSS roster and its per-run limits live in `lib/feeds.ts`. Each source also carries static publication-level accessibility metadata (`open`, `mostly_open`, `metered`, `mostly_paywalled`, `mixed`, or `unknown`). Accessibility is observational metadata only and does not affect ranking.
-
-The application cleanup mirrors the external Supabase cleanup policy by deleting published stories older than 72 hours regardless of score. After each full pipeline run, published inventory is also capped at six stories per source; the cap keeps the six strongest current stories using the existing score and freshness ranking signals. Draft or other non-published rows are excluded from both cleanup operations.
-
-Source priority currently has two configuration concepts: `editorial_priority` on the RSS source and `SOURCE_PRIORITY_BOOSTS` in scoring. `editorial_priority` remains unused, and the existing scoring behavior is intentionally unchanged. Consolidating these concepts is future technical debt rather than part of the Source Roster V2 rollout.
-
-## Model Evaluation
-
-To compare the audited 10-story sample across `gpt-5.2`, `gpt-5.6-terra`, and `gpt-5.6-luna` without writing to Supabase, run:
-
-```bash
-npm run model-eval
-```
-
-This command makes paid OpenAI API requests and writes the ignored local result to `tmp/model-eval.json`. It records validated editorial output, latency, token usage, estimated cost, and blank human-review fields for each criterion. It does not run automatically as part of the production pipeline.
-
-## Production Scheduling
-
-To run the pipeline automatically in production, add these environment variables in the Vercel project settings:
-
-- `OPENAI_API_KEY`
-- `NEXT_PUBLIC_SUPABASE_URL`
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-- `SUPABASE_SERVICE_ROLE_KEY`
-- `PIPELINE_SECRET`
-- `CRON_SECRET`
-
-Recommended setup:
-
-- Set `CRON_SECRET` to the same value as `PIPELINE_SECRET`
-- Keep both secrets in Production only unless you explicitly need Preview testing
-
-Manual production test:
-
-```bash
-curl -X POST https://your-production-domain/api/run-pipeline \
-  -H "Authorization: Bearer $PIPELINE_SECRET"
-```
-
-If a scheduled or manual run fails, inspect:
-
-- Vercel Function logs for `/api/run-pipeline`
-- Vercel deployment logs around the scheduled invocation time
-- Supabase logs if writes are failing after enrichment
-
-Vercel note:
-
-- Cron jobs run on production deployments and use UTC timing.
-
-## Daily Signal Email
-
-Daily Signal is a public opt-in email briefing sent with Resend. The configured owner recipient remains included, and the email reuses the same ordered story set as the website:
-
-1. The Lead is the current overall ranked story #1
-2. Worth Knowing is ranked stories #2–4
-3. On the Radar selects up to six current remaining stories while first limiting obvious source and topic repetition
-
-The email contains direct publisher links and a final link to `https://www.signalbrief.xyz/`. Public subscribers receive a signed, account-free unsubscribe link; the owner copy remains exempt.
-
-Public signup uses server-side validation, a honeypot, and a lightweight five-attempts-per-minute limiter. That limiter is held in process memory and is therefore per instance, not a globally durable distributed rate limit.
-
-### Resend setup
-
-1. Create a Resend account.
-2. Add and verify the domain or sending subdomain you will use.
-3. Create a sending-access API key.
-4. Set `RESEND_API_KEY` to that key.
-5. Set `DAILY_SIGNAL_FROM` to a sender on the verified domain, for example `Signal > Noise <briefing@updates.signalbrief.xyz>`.
-6. Set `DAILY_SIGNAL_RECIPIENT` to the owner recipient.
-7. Set `DAILY_SIGNAL_UNSUBSCRIBE_SECRET` to a random secret of at least 32 characters.
-
-Do not enable scheduled sending yet. Keep `DAILY_SIGNAL_ENABLED=false` until the schema, sender, recipient, and controlled manual test are confirmed.
-
-### Preview without sending
-
-In local development, open:
-
-```text
-http://localhost:3000/api/daily-signal/preview
-```
-
-The preview route renders the current briefing as email HTML, never sends, uses `no-store`, and returns 404 in production.
-
-### Protected manual test
-
-After applying the Supabase schema and configuring Resend, send one deliberate test with:
-
-```bash
-curl -X POST https://www.signalbrief.xyz/api/daily-signal \
-  -H "Authorization: Bearer $PIPELINE_SECRET"
-```
-
-The manual POST works while scheduled sending is disabled. It is idempotent for the current New York calendar date, so retries will not intentionally create another daily briefing.
-
-### Daily schedule and DST
-
-Vercel calls `/api/daily-signal` at both `12:10` and `13:10` UTC. The server converts the invocation time to `America/New_York` and proceeds only during the local 8:10–8:19 AM window. This produces one valid 8:10 AM invocation across daylight and standard time; the other invocation exits without selecting or sending.
-
-Scheduled requests require Vercel's `Authorization: Bearer $CRON_SECRET` header and also require `DAILY_SIGNAL_ENABLED=true`. With the flag absent or false, cron requests return a disabled result without reading stories, claiming a date, or contacting Resend.
-
-### Recipient privacy and duplicate-send protection
-
-Before transport, the server claims the local date in `daily_signal_sends`. Each owner/subscriber delivery then receives its own claim in `daily_signal_deliveries` and its own Resend request, so addresses are never placed together in To or CC. Successful recipient rows are skipped during a campaign retry; failed rows can be atomically reclaimed. Resend also receives a stable idempotency key derived from the local date and complete individual provider request, protecting the accepted-but-not-recorded failure case. A campaign is marked sent only after every recipient is sent or already recorded as sent.
-
-## Project Structure
-
-```text
-signal-noise/
-├─ app/
-│  ├─ api/
-│  │  └─ run-pipeline/
-│  │     └─ route.ts
-│  ├─ globals.css
-│  ├─ layout.tsx
-│  └─ page.tsx
-├─ components/
-│  ├─ Feed.tsx
-│  ├─ Header.tsx
-│  └─ StoryCard.tsx
-├─ data/
-│  ├─ enriched-stories.json
-│  └─ normalized-stories.json
-├─ lib/
-│  ├─ db.ts
-│  ├─ data.ts
-│  ├─ dedupe.ts
-│  ├─ env.ts
-│  ├─ feeds.ts
-│  ├─ openai.ts
-│  ├─ pipeline/
-│  │  ├─ enrich.ts
-│  │  ├─ ingest.ts
-│  │  └─ run.ts
-│  ├─ prompts.ts
-│  ├─ scoring.ts
-│  └─ utils.ts
-├─ scripts/
-│  ├─ enrich.ts
-│  └─ ingest.ts
-├─ supabase/
-│  └─ schema.sql
-├─ types/
-│  └─ story.ts
-├─ README.md
-├─ vercel.json
-├─ eslint.config.mjs
-├─ next.config.ts
-├─ package.json
-└─ tsconfig.json
-```
-
-## Notes
-
-- RSS sources remain defined in `lib/feeds.ts`, but homepage rendering now comes from Supabase.
-- The secured `/api/run-pipeline` route is the automation path for ingest → enrich → store.
-- No auth, admin UI, or background infrastructure is included in this foundation.
+See `docs/launch-work.md` for the October 2026 audit evidence, validation, and release limitations.

@@ -8,7 +8,7 @@ import {
   createSupabaseDailySignalSendLog,
   type DailySignalSendLog
 } from "@/lib/email/send-log";
-import { selectDailySignalStories } from "@/lib/email/selection";
+import { selectDailySignalStories, type DailySignalSelection } from "@/lib/email/selection";
 import {
   createResendTransport,
   getDailySignalEmailConfig,
@@ -46,7 +46,7 @@ export type DailySignalRunResult = {
 };
 
 export function getDailySignalHttpStatus(result: Pick<DailySignalRunResult, "status">) {
-  return result.status === "failed" ? 500 : 200;
+  return result.status === "failed" ? 500 : result.status === "insufficient-stories" ? 503 : 200;
 }
 
 type RunDailySignalOptions = {
@@ -161,9 +161,15 @@ export async function runDailySignal(
   }
 
   let stories: Story[];
+  let savedSelection: DailySignalSelection | null = null;
+  let persistedSendLog = options.sendLog;
 
   try {
-    stories = options.stories ?? (await loadStoryInventory(options));
+    if (!options.stories && !options.loadStories) {
+      persistedSendLog ??= createSupabaseDailySignalSendLog();
+      savedSelection = await persistedSendLog.loadSelection?.(localTime.localDate) ?? null;
+    }
+    stories = savedSelection ? [] : options.stories ?? (await loadStoryInventory(options));
   } catch (error) {
     const reason = safeErrorMessage(error);
     console.error(
@@ -179,12 +185,12 @@ export async function runDailySignal(
     };
   }
 
-  const selection = selectDailySignalStories(stories, now.getTime());
+  const selection = savedSelection ?? selectDailySignalStories(stories, now.getTime());
 
   if (!selection) {
     console.log("[daily-signal] skipped because no eligible stories were available");
     return {
-      success: true,
+      success: false,
       status: "insufficient-stories",
       localDate: localTime.localDate,
       selected: EMPTY_SELECTION,
@@ -228,6 +234,7 @@ export async function runDailySignal(
     subscriberId: string | null;
     type: "owner" | "subscriber";
     rendered: ReturnType<typeof renderDailySignalEmail>;
+    unsubscribeUrl?: string;
   }>;
 
   try {
@@ -257,6 +264,7 @@ export async function runDailySignal(
         normalizedEmail: email,
         subscriberId: subscriber.id,
         type: "subscriber",
+        unsubscribeUrl: `${SITE_URL}/api/daily-signal/unsubscribe?token=${encodeURIComponent(token)}`,
         rendered: renderDailySignalEmail(
           selection,
           now,
@@ -281,14 +289,14 @@ export async function runDailySignal(
   let sendLog: DailySignalSendLog;
 
   try {
-    sendLog = options.sendLog ?? createSupabaseDailySignalSendLog();
-    const claim = await sendLog.claim(localTime.localDate, contentHash, attemptedAt);
+    sendLog = persistedSendLog ?? createSupabaseDailySignalSendLog();
+    const claim = await sendLog.claim(localTime.localDate, contentHash, attemptedAt, selection);
 
     if (!claim.claimed) {
       console.log(`[daily-signal] duplicate send prevented: ${claim.reason}`);
       return {
-        success: true,
-        status: "duplicate",
+        success: claim.reason !== "payload-changed",
+        status: claim.reason === "payload-changed" ? "failed" : "duplicate",
         localDate: localTime.localDate,
         selected,
         reason: claim.reason
@@ -312,7 +320,9 @@ export async function runDailySignal(
   let providerMessageId: string | undefined;
   let failureReason: string | undefined;
 
+  const startedSendingAt = Date.now();
   for (const recipient of recipients) {
+    if (Date.now() - startedSendingAt > 240_000) { deliveries.failed += 1; failureReason = "Delivery time budget reached; remaining recipients require retry"; break; }
     const recipientHash = sha256(recipient.normalizedEmail);
     const payloadHash = sha256({
       from: config.from,
@@ -348,6 +358,7 @@ export async function runDailySignal(
         html: recipient.rendered.html,
         text: recipient.rendered.text,
         localDate: localTime.localDate,
+        unsubscribeUrl: recipient.unsubscribeUrl,
         idempotencyKey: createDailySignalProviderIdempotencyKey(localTime.localDate, {
           from: config.from,
           recipient: recipient.normalizedEmail,
@@ -359,6 +370,7 @@ export async function runDailySignal(
       await deliveryLog.markSent(localTime.localDate, recipientHash, response.id, new Date().toISOString());
       providerMessageId ??= response.id;
       deliveries.sent += 1;
+      if (!options.transport) await new Promise(resolve => setTimeout(resolve, 550));
     } catch (error) {
       failureReason = safeErrorMessage(error);
       deliveries.failed += 1;

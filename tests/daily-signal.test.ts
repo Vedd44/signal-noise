@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
@@ -58,7 +59,6 @@ const config = {
   from: "Signal > Noise <briefing@example.com>"
 };
 const emptySubscriberStore: DailySignalSubscriberStore = {
-  subscribe: async () => undefined,
   listActive: async () => [],
   unsubscribe: async () => undefined
 };
@@ -170,11 +170,11 @@ test("8:10 AM New York send window remains correct across standard and daylight 
   assert.equal(isDailySignalSendWindow(winter), true);
   assert.equal(isDailySignalSendWindow(summer), true);
   assert.equal(isDailySignalSendWindow(new Date("2026-01-15T13:09:00.000Z")), false);
-  assert.equal(isDailySignalSendWindow(new Date("2026-01-15T13:20:00.000Z")), false);
+  assert.equal(isDailySignalSendWindow(new Date("2026-01-15T13:40:00.000Z")), false);
   assert.equal(isDailySignalSendWindow(new Date("2026-07-15T13:10:00.000Z")), false);
 });
 
-test("dual UTC cron invokes Daily Signal at :10 after the unchanged six-hour pipeline", async () => {
+test("dual UTC cron invokes Daily Signal at :10 with a :30 recovery attempt", async () => {
   const vercelConfig = JSON.parse(
     await readFile(new URL("../vercel.json", import.meta.url), "utf8")
   ) as { crons: Array<{ path: string; schedule: string }> };
@@ -185,7 +185,7 @@ test("dual UTC cron invokes Daily Signal at :10 after the unchanged six-hour pip
   );
   assert.deepEqual(
     vercelConfig.crons.find((cron) => cron.path === "/api/daily-signal"),
-    { path: "/api/daily-signal", schedule: "10 12,13 * * *" }
+    { path: "/api/daily-signal", schedule: "10,30 12,13 * * *" }
   );
 });
 
@@ -338,7 +338,10 @@ test("duplicate send claims prevent provider calls", async () => {
 test("failed send is reclaimed and its retry can succeed", async () => {
   let existing: ExistingDailySignalSend = {
     status: "failed",
-    content_hash: "old-content",
+    content_hash: (() => {
+      const rendered = renderDailySignalEmail(selectDailySignalStories(stories, SEND_DATE.getTime())!, SEND_DATE);
+      return createHash('sha256').update(JSON.stringify({subject:rendered.subject,html:rendered.html,text:rendered.text})).digest('hex');
+    })(),
     attempted_at: "2026-09-04T11:00:00.000Z"
   };
   let providerCalls = 0;
@@ -398,14 +401,14 @@ test("in-progress send blocks an overlapping retry", () => {
   assert.equal(decision, "in-progress");
 });
 
-test("changed payload after a failed send can be reclaimed", () => {
+test("changed payload after a failed send is blocked to prevent accepted-but-unrecorded duplicates", () => {
   const decision = evaluateExistingDailySignalClaim(
     { status: "failed", content_hash: "old", attempted_at: "2026-09-04T11:00:00.000Z" },
     "new",
     SEND_DATE.toISOString()
   );
 
-  assert.equal(decision, "reclaim");
+  assert.equal(decision, "payload-changed");
 });
 
 test("changed payload after a sent send remains blocked", () => {
@@ -481,4 +484,28 @@ test("empty story sets skip cleanly without claiming or sending", async () => {
 
   assert.equal(result.status, "insufficient-stories");
   assert.equal(claimed, false);
+});
+
+
+test("campaign recovery renders the saved issue without rereading current inventory", async () => {
+  const selection = selectDailySignalStories(stories, SEND_DATE.getTime())!;
+  let snapshotRead = false;
+  let deliveredHtml = '';
+  const sendLog: DailySignalSendLog = {
+    loadSelection: async () => { snapshotRead = true; return selection; },
+    claim: async (_date, _hash, _attempt, snapshot) => {
+      assert.deepEqual(snapshot, selection);
+      return { claimed: true };
+    },
+    markSent: async () => undefined,
+    markFailed: async () => assert.fail('Saved issue should send')
+  };
+  const result = await runDailySignal({
+    now: new Date('2026-09-04T12:30:00Z'), config, sendLog,
+    subscriberStore: emptySubscriberStore, deliveryLog: acceptingDeliveryLog,
+    transport: { send: async message => { deliveredHtml = message.html; return {id:'saved-issue'}; } }
+  });
+  assert.equal(snapshotRead, true);
+  assert.equal(result.status, 'sent');
+  assert.equal(deliveredHtml, renderDailySignalEmail(selection, new Date('2026-09-04T12:10:00Z')).html);
 });
