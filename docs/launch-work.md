@@ -16,12 +16,11 @@ Resend sends individual emails to active subscribers and the configured owner. C
 - Text-only cards/email are intentional; all current image fields are empty and no broken images appear.
 - Signup immediately activates addresses; no confirmation lifecycle. Feedback routes email submissions directly and have no rate limits or durable storage. Feedback UI throws after success by accessing an expired event.currentTarget, and misses network errors.
 - GA loads on token-bearing unsubscribe pages; no explicit conversion or interaction events.
-- Feed includes duplicate newsletter roundups, thin-source Signals, and no presentation-level deduplication. Some categories are debatable (a biological-aging contest labeled AI).
+- Feed includes duplicate newsletter roundups, thin-source Signals, and no presentation-level deduplication. A consumer biological-aging contest was mislabeled AI.
 - Unbounded AI timeouts and sequential enrichment can exceed serverless execution time. No pipeline failure when every source/AI call fails.
 - Email can select stale lead stories and send an incomplete issue. A provider-accepted/database-write-failed recipient can be marked failed and later resent with changed content.
 - Registry audit: 12 advisories, including critical Next.js; updated within major versions to patched releases and audit now reports zero.
 
-Validation, deployment evidence, and residual limits will be recorded after implementation.
 
 ## Implemented changes
 
@@ -31,7 +30,7 @@ Validation, deployment evidence, and residual limits will be recorded after impl
 - Feedback is stored before notification, deduplicated, rate-limited, and retried independently of the browser. Corrected the success handler, loading/error states, URL validation, and mobile input size.
 - Removed analytics from token pages, added safe campaign attribution and launch events, and provided a privacy page. Confirmed conversion measurement remains in private database timestamps rather than GA on bearer-link pages.
 - Fixed publisher article extraction that previously consumed navigation/signup text. Improved grounded editorial prompts, conservative feed deduplication, URL/timestamp validation, bounded AI concurrency/timeouts, and durable pipeline failure tracking.
-- Eight approved live GPT-6 Luna evaluations all passed validation on the first attempt: 13,999 input tokens, 680 output tokens, mean request latency 2.84 seconds. Sample covered agents, enterprise AI, a product rumor, political reporting, creator economics, neurotechnology, and legal reporting. Reviewed against actual source bodies. Corrected three existing New Stack summaries/Signals, preserving story IDs and scores; two Signals received manual wording adjustments to keep costs/timeframes and test findings precise. Original values saved in the ignored local rollback artifact.
+- Eight approved live GPT-6 Luna evaluations all passed validation on the first attempt: 13,999 input tokens, 680 output tokens, mean request latency 2.84 seconds. Sample covered agents, enterprise AI, a product rumor, political reporting, creator economics, neurotechnology, and legal reporting. Reviewed against actual source bodies. Corrected three existing New Stack summaries/Signals, preserving story IDs and scores; two Signals received manual wording adjustments to keep costs/timeframes and test findings precise. Original values saved in the ignored local rollback artifact. Corrected the aging-test story to Consumer Tech without changing text or score.
 - Daily email refuses stale/incomplete issues, saves its selected issue, retries the identical payload, paces recipient sends, and supports mailbox one-click unsubscribe. Added 8:30 AM Eastern recovery while preserving normal 8:10 delivery and DST handling.
 - Preserved the established editorial layout, text-only cards/email, ranking/source rules, full Compact Signals, and existing public URLs. Added a short explanation of The Signal, keyboard skip link, clear failure states, branded 404, and successful-read caching.
 
@@ -51,3 +50,20 @@ Validation, deployment evidence, and residual limits will be recorded after impl
 Real Gmail/Outlook inbox placement, client dark-mode transformations, sender domain/reply handling, GA dashboard event arrival, and post-release scheduled execution require provider/dashboard or subsequent-run evidence. Browser email rendering and successful API acceptance do not prove inbox delivery. Production secret export was blocked by automatic approval review; no production environment secrets were downloaded. Tests use existing local access and public application routes instead.
 
 The daily campaign remains a small-list serverless sender. The five-minute execution limit and provider quotas require a queue before a large subscriber rollout. Bounce/complaint suppression relies on Resend's provider controls; no new webhook infrastructure was added. Confirmed acquisition can be measured from private `confirmed_at` plus attribution; GA's `signup_submitted` includes repeat addresses and should not be treated as a confirmed subscription.
+
+## Verified production release
+
+Application release: `23002e4fcab6484afd5e70becb79dc4521f0077b` on GitHub `main`. Vercel deployment `dpl_HxmYNQ5oUF45XpYds6VZhMwgbr8b` reached READY and served `https://www.signalbrief.xyz/`. Build logs confirm Next.js 16.3.8, successful compilation/type checks, and deployment completion. Application commits: `0c8ae54` (dependencies/providers), `495dd87` (confirmation/forms/privacy), `23002e4` (editorial/email reliability and operations). A subsequent documentation-only commit records this evidence.
+
+Production smoke checks passed:
+
+- Homepage, privacy, social image, robots and sitemap: 200. Unknown page: 404. Production email preview: 404. Unauthenticated automation: 401. Invalid email/source/feature/confirmation/unsubscribe input: 400.
+- Real signup submitted in the browser to Resend's documented labeled delivery-test address. The provider accepted the confirmation request and the database stored a pending record with the test UTM campaign. Repeat signup returned 200 without changing its token or sending another confirmation.
+- To independently exercise the confirmation page without exporting production secrets or reading an inbox, replaced only that disposable test record's hash with a known test token. Browser confirmation activated it, showed “You’re confirmed,” removed the URL token, and loaded no analytics. Repeat confirmation returned 200. Suppressed that test record immediately after testing; its old confirmation then returned 400. Two real active subscribers remain unchanged. This verifies confirmation state transitions, not receipt of the original emailed link.
+- Feature and source forms each showed success, persisted one private submission, and recorded provider-accepted owner notifications. Identical feature requests returned 200 without new rows, then 429 on the sixth request in a fresh rate-limit window.
+- Production Compact View at 320/390/768/1024/1440 px: 42 complete Signals, no clipped Signal containers or page overflow. Theme/filter controls worked. Publisher link opened the expected Verge article. Keyboard navigation reached the theme control with a visible outline; skip navigation reached the main content anchor. No browser console warnings/errors observed.
+- Homepage analytics script was present after hydration. It was absent on confirmation. Actual GA dashboard receipt remains a manual check.
+- Production network sample after caching change: response headers 269/107/69 ms; public JavaScript gzip total 184,719 bytes across 10 chunks. These samples are not a controlled performance benchmark; field Core Web Vitals remain unmeasured.
+- Public assets contained no local server-secret values or personal-mail-provider addresses. Private-table reads remained denied and draft rows inaccessible.
+
+Local visual evidence is saved in ignored `tmp/launch-evidence/` (desktop, compact mobile, signup, and confirmation). No bulk newsletter campaign was sent. Production signed-unsubscribe happy path was covered by signature/store tests and SQL lifecycle checks; the live endpoint's invalid-token path was verified, but no real subscriber's emailed unsubscribe link was used. The next scheduled ingestion and daily campaign have not yet run with this release.
