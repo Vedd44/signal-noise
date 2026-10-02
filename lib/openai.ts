@@ -12,6 +12,8 @@ export function getOpenAIApiKey() {
 
 export function getOpenAIClient() {
   return new OpenAI({
-    apiKey: getOpenAIApiKey()
+    apiKey: getOpenAIApiKey(),
+    timeout: 20_000,
+    maxRetries: 0 // The editorial pipeline owns its two-attempt limit.
   });
 }

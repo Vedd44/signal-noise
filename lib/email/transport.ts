@@ -1,4 +1,27 @@
-import { Resend } from "resend";
+export type EmailPayload = {
+  from: string; to: string[]; subject: string; html: string; text: string;
+  headers?: Record<string, string>;
+  tags?: Array<{ name: string; value: string }>;
+};
+
+/** Bounded provider calls; never include addresses in thrown provider errors. */
+export async function sendEmail(apiKey: string, payload: EmailPayload, idempotencyKey: string) {
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const response = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json', 'Idempotency-Key': idempotencyKey },
+      body: JSON.stringify(payload), signal: AbortSignal.timeout(10_000)
+    });
+    if (response.status === 429 && attempt === 0) {
+      await new Promise(resolve => setTimeout(resolve, 650));
+      continue;
+    }
+    const data = await response.json();
+    if (!response.ok || typeof data.id !== 'string') throw new Error(`Email provider failed (${response.status})`);
+    return { id: data.id as string };
+  }
+  throw new Error('Email provider rate limit');
+}
 
 export type DailySignalEmailConfig = {
   apiKey: string;
@@ -14,6 +37,7 @@ export type DailySignalTransportMessage = {
   text: string;
   localDate: string;
   idempotencyKey: string;
+  unsubscribeUrl?: string;
 };
 
 export type DailySignalTransport = {
@@ -42,22 +66,23 @@ export function getDailySignalEmailConfig(): DailySignalEmailConfig {
 }
 
 export function createResendTransport(apiKey: string): DailySignalTransport {
-  const resend = new Resend(apiKey);
   return {
     async send(message) {
-      const { data, error } = await resend.emails.send(
+      return sendEmail(apiKey,
         {
           from: message.from,
           to: [message.recipient],
           subject: message.subject,
           html: message.html,
           text: message.text,
+          ...(message.unsubscribeUrl ? { headers: {
+            'List-Unsubscribe': `<${message.unsubscribeUrl}>`,
+            'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click'
+          } } : {}),
           tags: [{ name: "briefing", value: "daily-signal" }]
         },
-        { idempotencyKey: message.idempotencyKey }
+        message.idempotencyKey
       );
-      if (error || !data?.id) throw new Error(error?.message ?? "Resend did not return a message ID");
-      return { id: data.id };
     }
   };
 }
