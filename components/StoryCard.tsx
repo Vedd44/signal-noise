@@ -38,7 +38,7 @@ export function StoryCard({ story, variant, index }: StoryCardProps) {
               {story.title}
             </a>
           </h3>
-          <p className="compact-summary compact-signal"><span>The Signal ›</span> {story.why_it_matters}</p>
+          <p className="compact-summary compact-signal"><span>The Signal:</span> {story.why_it_matters}</p>
         </div>
       </article>
     );
@@ -57,7 +57,7 @@ export function StoryCard({ story, variant, index }: StoryCardProps) {
           <p className="story-summary">{story.summary}</p>
         </div>
         <p className="story-why latest-why">
-          <span>The Signal ›</span> {story.why_it_matters}
+          <span>The Signal:</span> {story.why_it_matters}
         </p>
       </article>
     );
@@ -76,7 +76,7 @@ export function StoryCard({ story, variant, index }: StoryCardProps) {
         <p className="story-summary">{story.summary}</p>
 
         <p className="story-why">
-          <span>The Signal ›</span> {story.why_it_matters}
+          <span>The Signal:</span> {story.why_it_matters}
         </p>
 
       </div>

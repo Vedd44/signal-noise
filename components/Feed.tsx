@@ -284,7 +284,7 @@ export function Feed({ stories, lastRefreshedAt, unavailable = false }: FeedProp
                     <div className="latest-column-headings">
                       <span>Source</span>
                       <span>Story</span>
-                      <span>The Signal ›</span>
+                      <span>The Signal</span>
                     </div>
                     <div className="latest-list">
                       {latestStories.map((story) => (

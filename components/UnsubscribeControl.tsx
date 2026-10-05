@@ -28,7 +28,6 @@ export function UnsubscribeControl({ token }: { token: string }) {
   if (status === "success") {
     return (
       <div className="unsubscribe-state" role="status">
-        <p className="daily-signal-eyebrow">Daily Signal</p>
         <h1>You’re unsubscribed.</h1>
         <p>You won’t receive the Daily Signal anymore.</p>
       </div>
@@ -37,7 +36,6 @@ export function UnsubscribeControl({ token }: { token: string }) {
 
   return (
     <div className="unsubscribe-state" aria-live="polite">
-      <p className="daily-signal-eyebrow">Daily Signal</p>
       <h1>Leave the Daily Signal?</h1>
       <p>You can unsubscribe from the morning email below.</p>
       <button type="button" onClick={unsubscribe} disabled={status === "submitting"}>

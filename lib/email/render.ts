@@ -46,9 +46,9 @@ function renderFeaturedStory(
   return `
     <div class="story ${hierarchy}-story" style="padding:${storyPadding};">
       <p class="metadata" style="margin:0 0 9px;color:#938d83;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:.07em;line-height:1.5;text-transform:uppercase;">${metadata}</p>
-      <h2 class="headline ${hierarchy}-headline" style="margin:0 0 13px;color:#e8e3d9;font-family:Georgia,'Times New Roman',serif;font-size:${headlineSize};line-height:${headlineLineHeight};mso-line-height-rule:exactly;letter-spacing:-.025em;">${renderStoryLink(story, story.title, "headline")}</h2>
+      <h3 class="headline ${hierarchy}-headline" style="margin:0 0 13px;color:#e8e3d9;font-family:Georgia,'Times New Roman',serif;font-size:${headlineSize};line-height:${headlineLineHeight};mso-line-height-rule:exactly;letter-spacing:-.025em;">${renderStoryLink(story, story.title, "headline")}</h3>
       <p class="summary" style="margin:0 0 16px;color:#bbb4a8;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;">${escapeHtml(story.summary)}</p>
-      <p class="signal" style="margin:0 0 14px;color:#e8e3d9;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.56;"><span style="display:inline-block;margin-bottom:5px;color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">THE SIGNAL ›</span><br />${escapeHtml(story.why_it_matters)}</p>
+      <p class="signal" style="margin:0 0 14px;color:#e8e3d9;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.56;"><span style="color:#dc6d52;font-weight:700;">The Signal:</span> ${escapeHtml(story.why_it_matters)}</p>
       <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:1.5;">${renderStoryLink(story, `Read at ${story.source} →`)}</p>
     </div>`;
 }
@@ -57,7 +57,7 @@ function renderRadarStory(story: Story) {
   return `
     <tr>
       <td class="radar-row" style="padding:14px 0;">
-        <p class="radar-headline" style="margin:0 0 5px;color:#e8e3d9;font-family:Georgia,'Times New Roman',serif;font-size:17px;line-height:1.32;mso-line-height-rule:exactly;">${renderStoryLink(story, story.title, "headline")}</p>
+        <h3 class="radar-headline" style="margin:0 0 5px;color:#e8e3d9;font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:400;line-height:1.32;mso-line-height-rule:exactly;">${renderStoryLink(story, story.title, "headline")}</h3>
         <p class="metadata" style="margin:0;color:#938d83;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:.05em;line-height:1.4;text-transform:uppercase;">${escapeHtml(story.source)} &nbsp;/&nbsp; ${escapeHtml(story.tag)}</p>
       </td>
     </tr>`;
@@ -68,7 +68,7 @@ function renderPlainStory(story: Story, includeTime: boolean) {
     .filter(Boolean)
     .join(" / ");
 
-  return `${metadata}\n${story.title}\n${story.summary}\nTHE SIGNAL › ${story.why_it_matters}\n${story.url}`;
+  return `${metadata}\n${story.title}\n${story.summary}\nThe Signal: ${story.why_it_matters}\n${story.url}`;
 }
 
 export type RenderedDailySignalEmail = {
@@ -133,29 +133,29 @@ export function renderDailySignalEmail(
                 <p class="summary" style="margin:0 0 34px;color:#bbb4a8;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.5;">${PREHEADER}</p>
 
                 <div class="section-rule" style="padding:20px 0 22px;border-top:1px solid #48463f;">
-                  <p style="margin:0 0 14px;color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">TODAY IN BRIEF</p>
+                  <h2 style="margin:0 0 14px;color:#dc6d52;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;line-height:1.3;">Today in brief</h2>
                   <ul style="margin:0;padding:0 0 0 19px;color:#bbb4a8;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.5;">${briefHtml}</ul>
                 </div>
 
                 <div class="section-rule" style="padding-top:20px;border-top:1px solid #48463f;">
-                  <p style="margin:0 0 18px;color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">THE LEAD</p>
+                  <h2 style="margin:0 0 18px;color:#dc6d52;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;line-height:1.3;">The lead</h2>
                   ${renderFeaturedStory(selection.lead, true, "lead")}
                 </div>
 
                 ${selection.worthKnowing.length > 0 ? `
                 <div style="padding-top:25px;">
-                  <p style="margin:0 0 22px;color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">WORTH KNOWING</p>
+                  <h2 style="margin:0 0 22px;color:#dc6d52;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;line-height:1.3;">Worth knowing</h2>
                   ${worthKnowingHtml}
                 </div>` : ""}
 
                 ${selection.onRadar.length > 0 ? `
                 <div class="section-rule" style="margin-top:8px;padding-top:25px;border-top:1px solid #48463f;">
-                  <p style="margin:0 0 7px;color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;">ON THE RADAR</p>
+                  <h2 style="margin:0 0 7px;color:#dc6d52;font-family:Arial,Helvetica,sans-serif;font-size:18px;font-weight:700;line-height:1.3;">On the radar</h2>
                   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;">${radarHtml}</table>
                 </div>` : ""}
 
                 <div class="section-rule" style="margin-top:30px;padding-top:24px;border-top:1px solid #48463f;">
-                  <a href="${SITE_URL}/" target="_blank" rel="noopener noreferrer" style="color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:12px;font-weight:800;letter-spacing:.06em;text-decoration:none;text-transform:uppercase;">READ THE FULL BRIEFING →</a>
+                  <a href="${SITE_URL}/" target="_blank" rel="noopener noreferrer" style="color:#dc6d52;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;text-decoration:underline;">Read the full briefing →</a>
                   ${unsubscribeUrl ? `<p style="margin:22px 0 0;"><a href="${escapeHtml(unsubscribeUrl)}" style="color:#938d83;font-family:Arial,Helvetica,sans-serif;font-size:11px;text-decoration:underline;text-underline-offset:3px;">Unsubscribe</a></p>` : ""}
                 </div>
               </td>
@@ -171,22 +171,22 @@ export function renderDailySignalEmail(
     localTime.displayDate,
     PREHEADER,
     "",
-    "TODAY IN BRIEF",
+    "Today in brief",
     ...briefBullets.map((bullet) => `• ${bullet}`),
     "",
-    "THE LEAD",
+    "The lead",
     renderPlainStory(selection.lead, true),
     selection.worthKnowing.length > 0
-      ? `\nWORTH KNOWING\n\n${selection.worthKnowing
+      ? `\nWorth knowing\n\n${selection.worthKnowing
           .map((story) => renderPlainStory(story, false))
           .join("\n\n")}`
       : "",
     selection.onRadar.length > 0
-      ? `\nON THE RADAR\n\n${selection.onRadar
+      ? `\nOn the radar\n\n${selection.onRadar
           .map((story) => `${story.title}\n${story.source} / ${story.tag}\n${story.url}`)
           .join("\n\n")}`
       : "",
-    `\nREAD THE FULL BRIEFING →\n${SITE_URL}/`,
+    `\nRead the full briefing →\n${SITE_URL}/`,
     unsubscribeUrl ? `\nUnsubscribe\n${unsubscribeUrl}` : ""
   ]
     .filter(Boolean)

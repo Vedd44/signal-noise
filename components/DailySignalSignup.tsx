@@ -48,12 +48,11 @@ export function DailySignalSignup() {
       aria-live="polite"
     >
       <div className="daily-signal-copy">
-        <p className="daily-signal-eyebrow">Daily Signal</p>
-        <h2 id="daily-signal-title">{successful ? "Check your inbox." : "The signal, before the noise."}</h2>
+        <h2 id="daily-signal-title">{successful ? "Check your inbox." : "The Daily Signal, in your inbox."}</h2>
         <p>
           {successful
             ? "Confirm your email to start your morning briefing. Already subscribed? You’re all set. Check spam if the email hasn’t arrived."
-            : "The Lead, three stories Worth Knowing, and what’s On the Radar — delivered to your inbox every morning."}
+            : "The lead story, three more worth knowing, and a quick look at what’s on the radar. Every morning, with The Signal on why they matter."}
         </p>
       </div>
 
@@ -77,7 +76,7 @@ export function DailySignalSignup() {
             />
             <input className="signup-honeypot" name="company" tabIndex={-1} autoComplete="off" aria-hidden="true" />
             <button type="submit" disabled={state.status === "submitting"}>
-              {state.status === "submitting" ? "ADDING YOU…" : "GET THE DAILY SIGNAL →"}
+              {state.status === "submitting" ? "Adding you…" : "Get the Daily Signal →"}
             </button>
           </div>
           <p id="daily-signal-support" className="daily-signal-support">Around 8:10 AM Eastern. Free. Unsubscribe anytime. <a href="/privacy">Privacy</a></p>

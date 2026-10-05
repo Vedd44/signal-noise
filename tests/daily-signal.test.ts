@@ -112,10 +112,10 @@ test("email renderer produces editorial HTML, plain text, and direct publisher l
 
   assert.equal(rendered.subject, "The Signal | September 4");
   assert.equal(rendered.preheader, "The stories worth knowing today.");
-  assert.match(rendered.html, /THE LEAD/);
-  assert.match(rendered.html, /WORTH KNOWING/);
-  assert.match(rendered.html, /ON THE RADAR/);
-  assert.match(rendered.html, /THE SIGNAL ›/);
+  assert.match(rendered.html, /The lead/);
+  assert.match(rendered.html, /Worth knowing/);
+  assert.match(rendered.html, /On the radar/);
+  assert.match(rendered.html, /The Signal:/);
   assert.match(rendered.html, /https:\/\/publisher\.example\/story-/);
   assert.match(rendered.html, /bgcolor="#25241f"/);
   assert.match(rendered.html, /background:#25241f/);
@@ -127,7 +127,7 @@ test("email renderer produces editorial HTML, plain text, and direct publisher l
   assert.doesNotMatch(rendered.html, /border-bottom:1px solid/);
   assert.doesNotMatch(rendered.html, /background:#f7f6f2/);
   assert.doesNotMatch(rendered.html, /<script/i);
-  assert.match(rendered.text, /READ THE FULL BRIEFING/);
+  assert.match(rendered.text, /Read the full briefing/);
   assert.doesNotMatch(rendered.html, /Unsubscribe/);
   assert.doesNotMatch(rendered.text, /Unsubscribe/);
 

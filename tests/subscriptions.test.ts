@@ -95,7 +95,7 @@ test("subscriber form preserves accessible markup, approved copy, success, and s
   assert.match(component, /id="daily-signal-email"/);
   assert.match(component, /aria-describedby="daily-signal-support daily-signal-error"/);
   assert.match(component, /aria-live="polite"/);
-  assert.match(component, /The signal, before the noise\./);
+  assert.match(component, /The Daily Signal, in your inbox\./);
   assert.match(component, /Check your inbox\./);
   assert.match(component, /Confirm your email/);
 });

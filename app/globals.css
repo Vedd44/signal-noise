@@ -1749,3 +1749,40 @@ textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
 .privacy-page h1 { font-family: Georgia, serif; }
 .source-suggestion input, .source-suggestion textarea { font-size: 16px; }
 .daily-signal-fields input[type="email"] { font-size: 16px; }
+
+/* Let useful editorial labels read naturally, without repeating the column title. */
+.story-why > span,
+.compact-signal > span {
+  font-family: var(--sans);
+  font-size: 0.85em;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.daily-signal-fields button {
+  letter-spacing: 0.01em;
+  text-transform: none;
+}
+
+@media (min-width: 621px) {
+  .latest-story .latest-why > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 620px) {
+  .latest-story .latest-why > span {
+    display: inline;
+    margin: 0 0.28rem 0 0;
+    font-size: 0.85em;
+    letter-spacing: normal;
+  }
+}
