@@ -1,3 +1,4 @@
+import { getArticleAccessPreference } from "@/lib/article-access";
 import type { Story } from '@/types/story';
 import { canonicalStoryUrl } from '@/lib/urls';
 
@@ -22,7 +23,14 @@ export function dedupeStories(stories: Story[]) {
   const kept: Story[] = [];
   for (const story of stories) {
     const url = canonicalStoryUrl(story.url);
-    if (!url || seen.has(url) || kept.some(other => sameEvent(story, other))) continue;
+    if (!url || seen.has(url)) continue;
+    const duplicate = kept.findIndex(other => sameEvent(story, other));
+    if (duplicate >= 0) {
+      const existing = kept[duplicate];
+      if (story.score >= existing.score - 2 && getArticleAccessPreference(story) > getArticleAccessPreference(existing)) kept[duplicate] = story;
+      seen.add(url);
+      continue;
+    }
     // A publisher's newsletter often republishes the standalone article's full title.
     if (/^the download:/i.test(story.title) && stories.some(other => other.id !== story.id &&
       other.source === story.source && !/^the download:/i.test(other.title) &&

@@ -1786,3 +1786,6 @@ textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
     letter-spacing: normal;
   }
 }
+
+/* Access notices stay visible without competing with the story headline. */
+.story-meta .story-access { text-transform: none; letter-spacing: 0; font-weight: 400; color: var(--ink-muted); }

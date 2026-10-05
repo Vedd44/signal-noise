@@ -1,3 +1,4 @@
+import { detectArticleAccess } from "@/lib/article-access";
 import he from "he";
 
 import { normalizeExternalText } from "@/lib/pipeline/cleanText";
@@ -66,9 +67,9 @@ export function extractReadableSourceText(html: string) {
     .slice(0, MAX_SOURCE_TEXT_LENGTH);
 }
 
-export async function hydrateStorySource(story: NormalizedStory): Promise<NormalizedStory> {
+export async function hydrateStorySource(story: NormalizedStory, timeoutMs = SOURCE_FETCH_TIMEOUT_MS): Promise<NormalizedStory> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), SOURCE_FETCH_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const publisher = rssSources.find(source => source.name === story.source);
     const host = publisher ? new URL(publisher.rss_url).hostname.replace(/^www\./, '') : '';
@@ -117,11 +118,13 @@ export async function hydrateStorySource(story: NormalizedStory): Promise<Normal
       if (bytes > 2_000_000) { await reader.cancel(); return { ...story, source_fetch_status: 'source-too-large' }; }
       chunks.push(part.value);
     }
-    const sourceText = extractReadableSourceText(Buffer.concat(chunks).toString('utf8'));
+    const html = Buffer.concat(chunks).toString('utf8');
+    const article_access = detectArticleAccess(html);
+    const sourceText = extractReadableSourceText(html);
     if (sourceText.length < MIN_USEFUL_SOURCE_TEXT_LENGTH) {
-      return { ...story, source_fetch_status: "insufficient-source-text" };
+      return { ...story, article_access, source_fetch_status: "insufficient-source-text" };
     }
-    return { ...story, source_text: sourceText, source_fetch_status: "full-source" };
+    return { ...story, article_access, source_text: sourceText, source_fetch_status: "full-source" };
   } catch (error) {
     const status = error instanceof Error && error.name === "AbortError" ? "timeout" : "fetch-failed";
     return { ...story, source_fetch_status: status };

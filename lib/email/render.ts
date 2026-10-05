@@ -1,3 +1,4 @@
+import { getArticleAccessLabel } from "@/lib/article-access";
 import { SITE_URL } from "@/lib/site";
 import { DAILY_SIGNAL_TIME_ZONE, getDailySignalLocalTime } from "@/lib/email/schedule";
 import type { DailySignalSelection } from "@/lib/email/selection";
@@ -35,7 +36,7 @@ function renderFeaturedStory(
   includeTime: boolean,
   hierarchy: "lead" | "worth"
 ) {
-  const metadata = [story.source, includeTime ? formatPublicationTime(story) : null, story.tag]
+  const metadata = [story.source, includeTime ? formatPublicationTime(story) : null, story.tag, getArticleAccessLabel(story)]
     .filter(Boolean)
     .map((value) => escapeHtml(String(value)))
     .join(" &nbsp;/&nbsp; ");
@@ -58,13 +59,13 @@ function renderRadarStory(story: Story) {
     <tr>
       <td class="radar-row" style="padding:14px 0;">
         <h3 class="radar-headline" style="margin:0 0 5px;color:#e8e3d9;font-family:Georgia,'Times New Roman',serif;font-size:17px;font-weight:400;line-height:1.32;mso-line-height-rule:exactly;">${renderStoryLink(story, story.title, "headline")}</h3>
-        <p class="metadata" style="margin:0;color:#938d83;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:.05em;line-height:1.4;text-transform:uppercase;">${escapeHtml(story.source)} &nbsp;/&nbsp; ${escapeHtml(story.tag)}</p>
+        <p class="metadata" style="margin:0;color:#938d83;font-family:'Arial Narrow','Helvetica Neue Condensed',Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:.05em;line-height:1.4;text-transform:uppercase;">${escapeHtml(story.source)} &nbsp;/&nbsp; ${escapeHtml(story.tag)}${getArticleAccessLabel(story) ? ` &nbsp;/&nbsp; ${escapeHtml(getArticleAccessLabel(story)! )}` : ""}</p>
       </td>
     </tr>`;
 }
 
 function renderPlainStory(story: Story, includeTime: boolean) {
-  const metadata = [story.source, includeTime ? formatPublicationTime(story) : null, story.tag]
+  const metadata = [story.source, includeTime ? formatPublicationTime(story) : null, story.tag, getArticleAccessLabel(story)]
     .filter(Boolean)
     .join(" / ");
 
@@ -183,7 +184,7 @@ export function renderDailySignalEmail(
       : "",
     selection.onRadar.length > 0
       ? `\nOn the radar\n\n${selection.onRadar
-          .map((story) => `${story.title}\n${story.source} / ${story.tag}\n${story.url}`)
+          .map((story) => `${story.title}\n${story.source} / ${story.tag}${getArticleAccessLabel(story) ? ` / ${getArticleAccessLabel(story)}` : ""}\n${story.url}`)
           .join("\n\n")}`
       : "",
     `\nRead the full briefing →\n${SITE_URL}/`,

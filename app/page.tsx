@@ -27,7 +27,7 @@ const structuredData = {
   ]
 };
 
-const readBriefing = unstable_cache(() => getPublishedStories({throwOnError:true}), ['published-briefing-v2'], {revalidate:60});
+const readBriefing = unstable_cache(() => getPublishedStories({throwOnError:true}), ['published-briefing-access-v3'], {revalidate:60});
 export default async function HomePage() {
   let inventory: Awaited<ReturnType<typeof getPublishedStories>>;
   let unavailable = false;

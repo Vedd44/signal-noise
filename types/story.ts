@@ -35,6 +35,7 @@ export type Story = {
   status?: string;
   image_url?: string;
   read_time?: number;
+  article_access?: "open" | "subscription" | "registration" | "unknown";
 };
 
 export type NormalizedStory = {
@@ -49,6 +50,7 @@ export type NormalizedStory = {
   item_language?: string;
   source_text?: string;
   source_fetch_status?: string;
+  article_access?: "open" | "subscription" | "registration" | "unknown";
   created_at: string;
 };
 

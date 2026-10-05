@@ -11,6 +11,7 @@ Write like a sharp human editor briefing another informed person: concise, confi
 
 summary:
 - Exactly one factual sentence answering "What happened?"
+- Make the summary useful without clicking through. State the central development supported by the evidence; do not copy teaser or subscription marketing language, or guess facts hidden by an access gate.
 - Ideally 15–30 words, direct, with no throat-clearing or interpretation.
 
 why_it_matters ("THE SIGNAL"):

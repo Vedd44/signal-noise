@@ -1,3 +1,4 @@
+import { annotateArticleAccess } from "@/lib/article-access-server";
 import { publicHttpUrl } from "@/lib/urls";
 import { dedupeStories } from "@/lib/dedupe";
 import { getSupabaseReadClient } from "@/lib/db";
@@ -135,7 +136,7 @@ export async function getPublishedStories(options?: { throwOnError?: boolean }):
     }, null);
 
     return {
-      stories: dedupeStories(orderStoriesForFeed(stories)),
+      stories: dedupeStories(orderStoriesForFeed(await annotateArticleAccess(stories))),
       lastRefreshedAt
     };
   } catch (error) {

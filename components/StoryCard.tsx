@@ -1,3 +1,4 @@
+import { getArticleAccessLabel } from "@/lib/article-access";
 import type { Story } from "@/types/story";
 import { formatRelativeTime } from "@/lib/utils";
 
@@ -8,6 +9,7 @@ type StoryCardProps = {
 };
 
 function StoryMeta({ story, showScore = false }: { story: Story; showScore?: boolean }) {
+  const accessLabel = getArticleAccessLabel(story);
   const publishTimeLabel = formatRelativeTime(story.published_at);
 
   return (
@@ -17,13 +19,14 @@ function StoryMeta({ story, showScore = false }: { story: Story; showScore?: boo
       <time dateTime={story.published_at}>{publishTimeLabel}</time>
       <span aria-hidden="true">/</span>
       <span>{story.tag}</span>
+      {accessLabel ? <span className="story-access">{accessLabel}</span> : null}
       {showScore ? <span className="story-score">{story.score}</span> : null}
     </p>
   );
 }
 
 export function StoryCard({ story, variant, index }: StoryCardProps) {
-  const linkLabel = `${story.title} — ${story.source} (opens in a new tab)`;
+  const linkLabel = `${story.title} — ${story.source}${getArticleAccessLabel(story) ? ` — ${getArticleAccessLabel(story)}` : ""} (opens in a new tab)`;
 
   if (variant === "compact") {
     return (

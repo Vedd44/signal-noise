@@ -1,33 +1,22 @@
-import {
-  getAccessibilityPreference,
-  isPremierEligibleSource
-} from "@/lib/feeds";
+import { isPremierEligibleSource } from "@/lib/feeds";
+import { getArticleAccess, getArticleAccessPreference } from "@/lib/article-access";
 import { getStoryTopics } from "@/lib/utils";
 import type { PublicStoryTopic, Story } from "@/types/story";
 
-const LEAD_COMPARABLE_SCORE_GAP = 2;
+// An inaccessible lead needs a clear editorial advantage, not a one-point scoring edge.
+const LEAD_ACCESSIBLE_SCORE_GAP = 8;
 const WORTH_COMPARABLE_SCORE_GAP = 1;
 const ACCESSIBILITY_WINDOW = 3;
 
 function selectLeadStory(stories: Story[]) {
-  const eligible = stories.filter((story) => isPremierEligibleSource(story.source));
-  const topEligible = eligible[0];
-
-  if (!topEligible) return undefined;
-
-  return (
-    eligible.slice(0, ACCESSIBILITY_WINDOW).find((story) => {
-      return (
-        story.score >= topEligible.score - LEAD_COMPARABLE_SCORE_GAP &&
-        getAccessibilityPreference(story.source) >
-          getAccessibilityPreference(topEligible.source)
-      );
-    }) ?? topEligible
-  );
+  const top = stories[0];
+  if (!top) return undefined;
+  const accessible = stories.find(story => getArticleAccess(story) === 'open' && story.score >= top.score - LEAD_ACCESSIBLE_SCORE_GAP);
+  return accessible ?? top;
 }
 
 function selectWorthKnowingStories(stories: Story[]) {
-  const remaining = stories.filter((story) => isPremierEligibleSource(story.source));
+  const remaining = stories.filter((story) => getArticleAccess(story) === "open" || isPremierEligibleSource(story.source));
   const selected: Story[] = [];
 
   while (selected.length < 3 && remaining.length > 0) {
@@ -36,8 +25,8 @@ function selectWorthKnowingStories(stories: Story[]) {
       return story.score >= topCandidate.score - WORTH_COMPARABLE_SCORE_GAP;
     });
     const preferred = comparable.reduce((best, story) => {
-      return getAccessibilityPreference(story.source) >
-        getAccessibilityPreference(best.source)
+      return getArticleAccessPreference(story) >
+        getArticleAccessPreference(best)
         ? story
         : best;
     }, topCandidate);
