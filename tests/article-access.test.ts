@@ -16,7 +16,7 @@ test('article structured data identifies paid and free reporting without assumin
  assert.equal(detectArticleAccess('<div class="post-access-cta members"><div class="paid">This post is for paid members only</div><div class="members">Sign up for free access</div></div>'),'registration');
  assert.equal(detectArticleAccess('<div class="post-access-cta paid"><div class="paid">This post is for paid members only</div><div class="members">Sign up for free access</div></div>'),'subscription');
  assert.equal(getArticleAccessLabel(story('free',90,'404 Media','open')),null);
- assert.equal(getArticleAccessLabel(story('unknown',90,'404 Media','unknown')),'May require subscription');
+ assert.equal(getArticleAccessLabel(story('unknown',90,'404 Media','unknown')),null);
 });
 test('lead searches the entire pool for accessible reporting within eight points', () => {
  const candidates=[story('paid',95),story('paid2',94),story('paid3',93),story('free',90,'TechCrunch','open')];
@@ -30,4 +30,10 @@ test('comparable duplicate coverage prefers an accessible source without deletin
 test('email HTML and text explain access for featured and radar stories',()=>{
  const paid=story('paid',95); const rendered=renderDailySignalEmail({lead:paid,worthKnowing:[story('free',90,'TechCrunch','open')],onRadar:[story('registration',89,'404 Media','registration')]});
  assert.match(rendered.html,/Subscription required/);assert.match(rendered.text,/Subscription required/);assert.match(rendered.html,/Free account required/);assert.match(rendered.text,/Free account required/);
+});
+
+test('worth knowing searches beyond the top three for comparable accessible stories', () => {
+ const candidates=[story('lead',99,'TechCrunch','open'),story('paid',95),story('paid2',94),story('paid3',93),story('open1',91,'TechCrunch','open'),story('open2',90,'The Record','open'),story('open3',89,'TechSpot','open')];
+ assert.deepEqual(organizeBriefingStories(candidates,'All').worthKnowingStories.map(s=>s.id),['open1','open2','open3']);
+ assert.equal(organizeBriefingStories([story('lead',100,'TechCrunch','open'),story('exceptional',99),story('open',89,'TechCrunch','open')],'All').worthKnowingStories[0].id,'exceptional');
 });

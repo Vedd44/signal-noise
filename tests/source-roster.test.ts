@@ -41,7 +41,7 @@ function makeStory(index: number, overrides: Partial<Story> = {}): Story {
 }
 
 function makeCandidate(
-  source: "404 Media" | "The Register" | "The New Stack",
+  source: "404 Media" | "The Register" | "The New Stack" | "Engadget" | "TechSpot" | "The Record",
   title: string,
   rawSnippet: string
 ): NormalizedStory {
@@ -57,8 +57,8 @@ function makeCandidate(
   };
 }
 
-test("V2 config contains exactly the approved 17-source roster", () => {
-  assert.equal(rssSources.length, 17);
+test("V2 config contains the expanded 20-source roster", () => {
+  assert.equal(rssSources.length, 20);
   assert.deepEqual(
     rssSources.map((source) => source.name),
     [
@@ -78,16 +78,19 @@ test("V2 config contains exactly the approved 17-source roster", () => {
       "404 Media",
       "Rest of World",
       "Krebs on Security",
-      "The New Stack"
+      "The New Stack",
+      "Engadget",
+      "The Record",
+      "TechSpot"
     ]
   );
-  assert.equal(rssSources.some((source) => source.name === "Engadget"), false);
+  assert.equal(rssSources.some((source) => source.name === "Engadget"), true);
   assert.equal(rssSources.some((source) => source.name === "Digital Trends"), false);
 });
 
 test("Stratechery remains classified for retained stories but is disabled for ingestion", () => {
   assert.equal(rssSources.find((source) => source.name === "Stratechery")?.enabled, false);
-  assert.equal(activeRssSources.length, 16);
+  assert.equal(activeRssSources.length, 19);
   assert.equal(activeRssSources.some((source) => source.name === "Stratechery"), false);
 });
 
@@ -99,17 +102,20 @@ test("V2 config uses the approved source types, limits, and Ars section feed", (
     ["Apple Newsroom", 1],
     ["Platformer", 1],
     ["TechCrunch", 2],
-    ["The Verge", 2],
+    ["The Verge", 1],
     ["WIRED", 1],
     ["Ars Technica", 2],
     ["Stratechery", 1],
-    ["MIT Technology Review", 2],
+    ["MIT Technology Review", 1],
     ["IEEE Spectrum", 1],
     ["The Register", 1],
     ["404 Media", 1],
     ["Rest of World", 1],
     ["Krebs on Security", 1],
-    ["The New Stack", 1]
+    ["The New Stack", 1],
+    ["Engadget", 1],
+    ["The Record", 1],
+    ["TechSpot", 1]
   ]);
 
   for (const source of rssSources) {
@@ -341,4 +347,10 @@ test("The New Stack meaningful agent-development change is accepted", () => {
     ),
     true
   );
+});
+
+test("new consumer feeds reject shopping comparisons but retain meaningful platform developments",()=>{
+ assert.equal(passesSourceSpecificRelevanceGuard(makeCandidate('Engadget','Oura Ring 5 vs. Apple Watch Series 12: Which wearable is right for you?','Smart health hardware comparison.')),false);
+ assert.equal(passesSourceSpecificRelevanceGuard(makeCandidate('TechSpot','What is the purpose of a battery symbol next to a USB Port?','Hardware explainer for a laptop port.')),false);
+ assert.equal(passesSourceSpecificRelevanceGuard(makeCandidate('Engadget','OpenAI will add a digital watermark to text and code generated in the EU','OpenAI changes its AI output policy in response to European regulation.')),true);
 });

@@ -96,7 +96,7 @@ test("premier slots exclude restricted sources while Latest retains their storie
   assert.equal(briefing.leadStory?.id, "mostly-open-lead");
   assert.deepEqual(
     briefing.worthKnowingStories.map((story) => story.id),
-    ["metered-top", "open-worth", "metered-worth"]
+    ["open-worth", "metered-top", "metered-worth"]
   );
   assert.equal(
     briefing.worthKnowingStories.some((story) => story.source === "Stratechery"),

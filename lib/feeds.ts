@@ -73,7 +73,7 @@ export const rssSources: RssSource[] = [
     rss_url: "https://www.theverge.com/rss/index.xml",
     source_type: "reporting",
     editorial_priority: 8,
-    max_items_per_source: 2,
+    max_items_per_source: 1,
     accessibility: "metered"
   },
   {
@@ -106,7 +106,7 @@ export const rssSources: RssSource[] = [
     rss_url: "https://www.technologyreview.com/feed/",
     source_type: "reporting",
     editorial_priority: 6,
-    max_items_per_source: 2,
+    max_items_per_source: 1,
     accessibility: "metered"
   },
   {
@@ -156,7 +156,32 @@ export const rssSources: RssSource[] = [
     editorial_priority: 5,
     max_items_per_source: 1,
     accessibility: "open"
+  },
+  {
+    name: "Engadget",
+    rss_url: "https://www.engadget.com/rss.xml",
+    source_type: "reporting",
+    editorial_priority: 5,
+    max_items_per_source: 1,
+    accessibility: "mostly_open"
+  },
+  {
+    name: "The Record",
+    rss_url: "https://therecord.media/feed",
+    source_type: "reporting",
+    editorial_priority: 5,
+    max_items_per_source: 1,
+    accessibility: "open"
+  },
+  {
+    name: "TechSpot",
+    rss_url: "https://www.techspot.com/backend.xml",
+    source_type: "reporting",
+    editorial_priority: 4,
+    max_items_per_source: 1,
+    accessibility: "mostly_open"
   }
+
 ];
 
 export const activeRssSources = rssSources.filter((source) => source.enabled !== false);

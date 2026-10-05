@@ -1,12 +1,11 @@
 import { isPremierEligibleSource } from "@/lib/feeds";
-import { getArticleAccess, getArticleAccessPreference } from "@/lib/article-access";
+import { getArticleAccess } from "@/lib/article-access";
 import { getStoryTopics } from "@/lib/utils";
 import type { PublicStoryTopic, Story } from "@/types/story";
 
 // An inaccessible lead needs a clear editorial advantage, not a one-point scoring edge.
 const LEAD_ACCESSIBLE_SCORE_GAP = 8;
-const WORTH_COMPARABLE_SCORE_GAP = 1;
-const ACCESSIBILITY_WINDOW = 3;
+const WORTH_ACCESSIBLE_SCORE_GAP = 8;
 
 function selectLeadStory(stories: Story[]) {
   const top = stories[0];
@@ -21,15 +20,9 @@ function selectWorthKnowingStories(stories: Story[]) {
 
   while (selected.length < 3 && remaining.length > 0) {
     const topCandidate = remaining[0];
-    const comparable = remaining.slice(0, ACCESSIBILITY_WINDOW).filter((story) => {
-      return story.score >= topCandidate.score - WORTH_COMPARABLE_SCORE_GAP;
-    });
-    const preferred = comparable.reduce((best, story) => {
-      return getArticleAccessPreference(story) >
-        getArticleAccessPreference(best)
-        ? story
-        : best;
-    }, topCandidate);
+    const preferred = remaining.find(story =>
+      getArticleAccess(story) === 'open' && story.score >= topCandidate.score - WORTH_ACCESSIBLE_SCORE_GAP
+    ) ?? topCandidate;
 
     selected.push(preferred);
     remaining.splice(

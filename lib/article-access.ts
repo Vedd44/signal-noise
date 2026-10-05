@@ -52,7 +52,5 @@ export function getArticleAccessPreference(story: Pick<Story, 'source' | 'articl
 export function getArticleAccessLabel(story: Pick<Story, 'source' | 'article_access'>) {
   if (story.article_access === 'subscription') return 'Subscription required';
   if (story.article_access === 'registration') return 'Free account required';
-  if (getArticleAccess(story) === 'open') return null;
-  const source = getSourceAccessibility(story.source);
-  return source === 'unknown' ? null : 'May require subscription';
+  return null;
 }

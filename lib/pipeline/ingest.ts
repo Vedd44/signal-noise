@@ -124,7 +124,7 @@ const ALLOWLIST_PATTERNS = [
   /\bearbuds?\b/i
 ];
 
-const GUARDED_SOURCES = new Set(["404 Media", "The Register", "The New Stack"]);
+const GUARDED_SOURCES = new Set(["404 Media", "The Register", "The New Stack", "Engadget", "The Record", "TechSpot"]);
 const GUARDED_SOURCE_RELEVANCE_GROUPS = [
   /\b(ai|artificial intelligence|llm|large language model|agents?|agentic|chatgpt|claude|gemini|model training)\b/i,
   /\b(platform|social media|social network|app store|marketplace|browsers?|cloud|streaming|publisher|advertising technology)\b/i,
@@ -147,6 +147,8 @@ export function passesSourceSpecificRelevanceGuard(story: NormalizedStory) {
     return true;
   }
 
+  if (["Engadget", "TechSpot"].includes(story.source) &&
+      /\bvs\.?\b|^what is (?:the purpose|a|an)\b|\bwhich .{0,60}(?:right for you|should you buy)\b|\bbest (?:power banks|phones|laptops|deals)\b/i.test(story.title)) return false;
   const title = story.title.trim();
   const combined = `${title} ${story.raw_snippet}`.trim();
   const routineContent = GUARDED_SOURCE_ROUTINE_CONTENT.some((pattern) => pattern.test(title));
