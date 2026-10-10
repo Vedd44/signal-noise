@@ -11,7 +11,11 @@ export function Analytics() {
     if (pathname !== '/' || location.hostname !== 'www.signalbrief.xyz' || navigator.doNotTrack === '1') return;
     captureCampaign();
     window.dataLayer = window.dataLayer || [];
-    window.gtag = window.gtag || function (...args: unknown[]) { window.dataLayer!.push(args); };
+    window.gtag = window.gtag || function () {
+      // gtag dispatches Arguments objects as commands; arrays are data-model calls.
+      // eslint-disable-next-line prefer-rest-params
+      window.dataLayer!.push(arguments);
+    };
     let referrer = '';
     try { referrer = document.referrer ? new URL(document.referrer).origin : ''; } catch { /* Invalid referrer is omitted. */ }
     window.gtag('js', new Date());
