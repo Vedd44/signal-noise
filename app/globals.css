@@ -1882,3 +1882,81 @@ textarea:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
   font-style: italic;
   font-weight: 400;
 }
+
+/* Mobile masthead: one editorial hierarchy, followed by a separate reading-controls row. */
+@media (max-width: 620px) {
+  .masthead { border-bottom-width: 1px; }
+
+  .masthead-body {
+    gap: 0.65rem;
+    padding-block: 1rem 1.15rem;
+  }
+
+  .masthead-aside { gap: 0.65rem; }
+
+  .masthead-summary {
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+
+  .masthead-daily-signal {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: normal;
+    text-transform: none;
+    text-decoration-color: currentColor;
+  }
+
+  .briefing-bar {
+    gap: 0.65rem;
+    padding: 1rem 1rem 0.5rem;
+  }
+
+  .briefing-heading {
+    display: grid;
+    gap: 0.25rem;
+  }
+
+  .briefing-title {
+    font-family: var(--serif);
+    font-size: 1.25rem;
+    font-weight: 400;
+    letter-spacing: normal;
+    line-height: 1.2;
+    text-transform: none;
+  }
+
+  .briefing-updated {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    letter-spacing: normal;
+    line-height: 1.4;
+    text-transform: none;
+  }
+
+  .briefing-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.375rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid var(--rule-soft);
+  }
+
+  .briefing-actions .view-toggle {
+    flex: 0 0 auto;
+    gap: 0.5rem;
+  }
+
+  .briefing-actions button {
+    min-height: 2.75rem;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .editorial-feed { padding-top: 1.5rem; }
+  .lead-section { gap: 0.75rem; }
+  .lead-story { gap: 0.75rem; }
+}
