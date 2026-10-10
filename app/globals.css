@@ -1396,7 +1396,7 @@ input:focus-visible {
 
   .briefing-bar {
     margin-inline: 0;
-    padding-inline: 0;
+    padding-inline: 1rem;
   }
 
   .editorial-feed {
