@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 import { track } from "@/lib/analytics";
 import { StoryCard } from "@/components/StoryCard";
@@ -8,22 +9,13 @@ import { DailySignalSignup } from "@/components/DailySignalSignup";
 import { ThemeControl } from "@/components/ThemeControl";
 import { SourceSuggestion } from "@/components/SourceSuggestion";
 import { organizeBriefingStories } from "@/lib/briefing";
+import { FEED_TOPICS, readFeedTopic, withFeedTopic } from "@/lib/feed-topic";
 import type { PublicStoryTopic, Story } from "@/types/story";
 import { formatRelativeTime } from "@/lib/utils";
 
 export { organizeBriefingStories } from "@/lib/briefing";
 
 type FeedView = "list" | "compact";
-
-const TOPICS: PublicStoryTopic[] = [
-  "All",
-  "AI",
-  "Media",
-  "Strategy",
-  "Product",
-  "Business",
-  "Consumer Tech"
-];
 
 type FeedProps = {
   stories: Story[];
@@ -33,7 +25,14 @@ type FeedProps = {
 
 export function Feed({ stories, lastRefreshedAt, unavailable = false }: FeedProps) {
   const [view, setView] = useState<FeedView>("list");
-  const [topic, setTopic] = useState<PublicStoryTopic>("All");
+  const searchParams = useSearchParams();
+  const topic = readFeedTopic(searchParams.get("topic"));
+  const setTopic = (nextTopic: PublicStoryTopic) => {
+    // Keep this visit's filter through Privacy → Back without adding a history
+    // entry per click, scrolling, or re-fetching the briefing. Next synchronizes
+    // native history changes with useSearchParams, including Back and Forward.
+    window.history.replaceState(null, "", withFeedTopic(window.location.href, nextTopic));
+  };
   const [isAutoScrolling, setIsAutoScrolling] = useState(false);
   const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
   const [showBackToTop, setShowBackToTop] = useState(false);
@@ -226,7 +225,7 @@ export function Feed({ stories, lastRefreshedAt, unavailable = false }: FeedProp
             <fieldset className="topic-filter">
               <legend className="sr-only">Filter stories by topic</legend>
               <div className="topic-filter-track">
-                {TOPICS.map((item) => (
+                {FEED_TOPICS.map((item) => (
                   <button
                     key={item}
                     type="button"
@@ -320,3 +319,4 @@ export function Feed({ stories, lastRefreshedAt, unavailable = false }: FeedProp
     </section>
   );
 }
+
