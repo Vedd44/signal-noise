@@ -10,12 +10,11 @@ import { ThemeControl } from "@/components/ThemeControl";
 import { SourceSuggestion } from "@/components/SourceSuggestion";
 import { organizeBriefingStories } from "@/lib/briefing";
 import { FEED_TOPICS, readFeedTopic, withFeedTopic } from "@/lib/feed-topic";
+import { readFeedView, withFeedView, type FeedView } from "@/lib/feed-view";
 import type { PublicStoryTopic, Story } from "@/types/story";
 import { formatRelativeTime } from "@/lib/utils";
 
 export { organizeBriefingStories } from "@/lib/briefing";
-
-type FeedView = "list" | "compact";
 
 type FeedProps = {
   stories: Story[];
@@ -24,8 +23,13 @@ type FeedProps = {
 };
 
 export function Feed({ stories, lastRefreshedAt, unavailable = false }: FeedProps) {
-  const [view, setView] = useState<FeedView>("list");
   const searchParams = useSearchParams();
+  const view = readFeedView(searchParams.get("view"));
+  const setView = (nextView: FeedView) => {
+    // Preserve this visit's reading layout alongside its topic, without adding
+    // a history entry or changing another visit's preferences.
+    window.history.replaceState(null, "", withFeedView(window.location.href, nextView));
+  };
   const topic = readFeedTopic(searchParams.get("topic"));
   const setTopic = (nextTopic: PublicStoryTopic) => {
     // Keep this visit's filter through Privacy → Back without adding a history
@@ -240,10 +244,13 @@ export function Feed({ stories, lastRefreshedAt, unavailable = false }: FeedProp
             </fieldset>
 
             {filteredBriefingStories.length === 0 ? (
-              <div className="feed-empty-state filtered-empty-state">
-                <p className="feed-empty-title">No {topic} stories are live right now.</p>
-                <p className="feed-empty-copy">Choose another category or return to All.</p>
-              </div>
+              <>
+                <div className="feed-empty-state filtered-empty-state">
+                  <p className="feed-empty-title">No {topic} stories are live right now.</p>
+                  <p className="feed-empty-copy">Choose another category or return to All.</p>
+                </div>
+                <DailySignalSignup />
+              </>
             ) : view === "compact" ? (
               <>
                 <section className="compact-section" aria-labelledby="compact-title">
