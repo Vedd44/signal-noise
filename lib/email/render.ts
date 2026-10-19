@@ -159,7 +159,7 @@ export function renderDailySignalEmail(
                 </div>` : ""}
 
                 <div class="section-rule" style="margin-top:30px;padding-top:24px;border-top:1px solid #48463f;">
-                  <a href="${SITE_URL}/" target="_blank" rel="noopener noreferrer" style="color:#dc6d52;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;text-decoration:underline;">Read the full briefing →</a>
+                  <a href="${SITE_URL}/" target="_blank" rel="noopener noreferrer" style="color:#dc6d52;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:700;text-decoration:underline;">Read the latest briefing →</a>
                   ${unsubscribeUrl ? `<p style="margin:22px 0 0;"><a href="${escapeHtml(unsubscribeUrl)}" style="color:#938d83;font-family:Arial,Helvetica,sans-serif;font-size:11px;text-decoration:underline;text-underline-offset:3px;">Unsubscribe</a></p>` : ""}
                 </div>
               </td>
@@ -191,7 +191,7 @@ export function renderDailySignalEmail(
           .map((story) => `${story.title}\n${story.source} / ${story.tag}${getArticleAccessLabel(story) ? ` / ${getArticleAccessLabel(story)}` : ""}\n${story.url}`)
           .join("\n\n")}`
       : "",
-    `\nRead the full briefing →\n${SITE_URL}/`,
+    `\nRead the latest briefing →\n${SITE_URL}/`,
     unsubscribeUrl ? `\nUnsubscribe\n${unsubscribeUrl}` : ""
   ]
     .filter(Boolean)
