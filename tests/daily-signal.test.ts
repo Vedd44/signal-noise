@@ -127,7 +127,7 @@ test("email renderer produces editorial HTML, plain text, and direct publisher l
   assert.doesNotMatch(rendered.html, /border-bottom:1px solid/);
   assert.doesNotMatch(rendered.html, /background:#f7f6f2/);
   assert.doesNotMatch(rendered.html, /<script/i);
-  assert.match(rendered.text, /Read the full briefing/);
+  assert.match(rendered.text, /Read the latest briefing/);
   assert.doesNotMatch(rendered.html, /Unsubscribe/);
   assert.doesNotMatch(rendered.text, /Unsubscribe/);
 
