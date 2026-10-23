@@ -1,3 +1,4 @@
+import { isStoryProcessingAllowed } from "@/lib/source-policy";
 import { mapConcurrent } from "@/lib/pipeline/concurrency";
 import fs from "node:fs/promises";
 import path from "node:path";
@@ -187,6 +188,7 @@ function storyContentIsUnchanged(story: NormalizedStory, existing: ExistingStory
 export async function filterExistingStories(
   stories: NormalizedStory[]
 ): Promise<ExistingStoryFilterResult> {
+  stories = stories.filter(isStoryProcessingAllowed);
   if (stories.length === 0) {
     return {
       storiesToEnrich: [],
@@ -277,7 +279,7 @@ export async function writeEnrichedStories(stories: Story[]) {
 
 export async function upsertStories(stories: Story[]): Promise<UpsertStoriesResult> {
   const languageEligibility = partitionStoriesByEnglishEligibility(stories);
-  stories = languageEligibility.eligibleStories;
+  stories = languageEligibility.eligibleStories.filter(isStoryProcessingAllowed);
 
   if (stories.length === 0) {
     return {
@@ -483,6 +485,7 @@ export async function enrichStoryForModel(
 > {
   const model = getOpenAIModel(requestedModel);
   const usage = createAiUsageSummary(model);
+  if (!isStoryProcessingAllowed(story)) return { enrichment: null, attempts: 0, reason: "source-policy-excluded", usage };
   let lastFailureReason = "invalid enrichment payload";
 
   for (let attempt = 0; attempt < MAX_ENRICHMENT_ATTEMPTS; attempt += 1) {
@@ -590,7 +593,7 @@ export async function runEnrichmentPipeline(
   options?: { batchSize?: number; model?: string }
 ): Promise<EnrichmentRunResult> {
   const model = getOpenAIModel(options?.model);
-  const languageEligibility = partitionStoriesByEnglishEligibility(normalizedStories);
+  const languageEligibility = partitionStoriesByEnglishEligibility(normalizedStories.filter(isStoryProcessingAllowed));
   const batch = languageEligibility.eligibleStories.slice(0, getBatchSize(options?.batchSize));
   const enriched: Story[] = [];
   const skippedStories: Array<{ title: string; reason: string }> =

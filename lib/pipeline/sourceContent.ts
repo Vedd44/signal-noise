@@ -1,3 +1,4 @@
+import { isStoryProcessingAllowed, isSourceProcessingAllowed } from "@/lib/source-policy";
 import { detectArticleAccess } from "@/lib/article-access";
 import he from "he";
 
@@ -68,6 +69,7 @@ export function extractReadableSourceText(html: string) {
 }
 
 export async function hydrateStorySource(story: NormalizedStory, timeoutMs = SOURCE_FETCH_TIMEOUT_MS): Promise<NormalizedStory> {
+  if (!isStoryProcessingAllowed(story)) return { ...story, source_text: undefined, raw_snippet: "", source_fetch_status: "source-policy-excluded" };
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -77,7 +79,7 @@ export async function hydrateStorySource(story: NormalizedStory, timeoutMs = SOU
     const base = parts.slice(host.endsWith('.co.uk') ? -3 : -2).join('.');
     const permitted = (value: string) => {
       const safe = publicHttpUrl(value);
-      if (!safe || !base) return false;
+      if (!safe || !base || !isSourceProcessingAllowed(story.source, safe)) return false;
       const url = new URL(safe);
       return url.protocol === 'https:' && (!url.port || url.port === '443') && (url.hostname === base || url.hostname.endsWith(`.${base}`));
     };
@@ -134,5 +136,5 @@ export async function hydrateStorySource(story: NormalizedStory, timeoutMs = SOU
 }
 
 export function hasEnoughEvidence(story: NormalizedStory) {
-  return Boolean(story.source_text?.trim()) || story.raw_snippet.trim().length >= 350;
+  return isStoryProcessingAllowed(story) && (Boolean(story.source_text?.trim()) || story.raw_snippet.trim().length >= 350);
 }

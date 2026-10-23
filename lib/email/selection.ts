@@ -1,3 +1,4 @@
+import { isStoryProcessingAllowed } from "@/lib/source-policy";
 import { dedupeStories } from "@/lib/dedupe";
 import { publicHttpUrl } from "@/lib/urls";
 import { organizeBriefingStories } from "@/lib/briefing";
@@ -24,7 +25,7 @@ export function selectDailySignalStories(
 ): DailySignalSelection | null {
   stories = dedupeStories(stories.filter(story => {
     const published = Date.parse(story.published_at);
-    return Number.isFinite(published) && published <= now+5*60_000 && now-published <= 72*3600_000 &&
+    return isStoryProcessingAllowed(story) && Number.isFinite(published) && published <= now+5*60_000 && now-published <= 72*3600_000 &&
       publicHttpUrl(story.url) && story.summary.trim() && story.why_it_matters.trim();
   }));
   if (stories.length < 4 || !stories.some(story => now-Date.parse(story.published_at) <= 24*3600_000)) {

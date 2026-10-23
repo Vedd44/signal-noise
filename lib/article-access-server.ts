@@ -1,3 +1,4 @@
+import { isStoryProcessingAllowed } from "@/lib/source-policy";
 import { unstable_cache } from 'next/cache';
 import { hydrateStorySource } from '@/lib/pipeline/sourceContent';
 import type { Story } from '@/types/story';
@@ -10,7 +11,7 @@ const inspectAccess = unstable_cache(async (url: string, source: string) => {
 
 export async function annotateArticleAccess(stories: Story[]): Promise<Story[]> {
   return Promise.all(stories.map(async (story, index) => {
-    if (story.source_type === 'primary' || index >= 100) return story;
+    if (!isStoryProcessingAllowed(story) || story.source_type === 'primary' || index >= 100) return story;
     try { return { ...story, article_access: await inspectAccess(story.url, story.source) }; }
     catch { return { ...story, article_access: 'unknown' }; }
   }));

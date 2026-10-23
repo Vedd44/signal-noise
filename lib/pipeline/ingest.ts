@@ -1,3 +1,4 @@
+import { isStoryProcessingAllowed, isSourceProcessingAllowed } from "@/lib/source-policy";
 import { publicHttpUrl } from "@/lib/urls";
 import { createHash } from "node:crypto";
 import fs from "node:fs/promises";
@@ -181,23 +182,28 @@ function computeCandidatePriority(story: NormalizedStory) {
   return getSourcePriorityBoost(story.source) * 10 - ageHours;
 }
 
-async function fetchFeedXml(url: string) {
+export async function fetchFeedXml(url: string) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
-
   try {
-    const response = await fetch(url, {
-      headers: {
-        "user-agent": "signal-noise-ingest/0.1"
-      },
-      signal: controller.signal
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    for (let redirect = 0; redirect < 4; redirect++) {
+      if (!isSourceProcessingAllowed("", url)) throw new Error("source-policy-excluded");
+      const response = await fetch(url, {
+        headers: { "user-agent": "signal-noise-ingest/0.1" },
+        redirect: "manual",
+        signal: controller.signal
+      });
+      if (response.status >= 300 && response.status < 400) {
+        const location = response.headers.get("location");
+        await response.body?.cancel();
+        if (!location) throw new Error("Feed redirect missing location");
+        url = new URL(location, url).href;
+        continue;
+      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.text();
     }
-
-    return await response.text();
+    throw new Error("Too many feed redirects");
   } finally {
     clearTimeout(timeout);
   }
@@ -238,7 +244,7 @@ function normalizeItem(
   const url = publicHttpUrl(item.link?.trim() ?? "");
   const published_at = normalizePublishedAt(item);
 
-  if (!title || !url || !published_at || Date.parse(published_at) > Date.now()+5*60_000 || Date.parse(published_at) < Date.now()-72*3600_000) {
+  if (!isStoryProcessingAllowed({ source: source.name, url: url ?? "" }) || !title || !url || !published_at || Date.parse(published_at) > Date.now()+5*60_000 || Date.parse(published_at) < Date.now()-72*3600_000) {
     return null;
   }
 

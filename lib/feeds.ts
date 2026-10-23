@@ -1,3 +1,4 @@
+import { isSourceProcessingAllowed } from "@/lib/source-policy";
 import type { Story, StorySourceType } from "@/types/story";
 
 export type RssSource = {
@@ -184,7 +185,7 @@ export const rssSources: RssSource[] = [
 
 ];
 
-export const activeRssSources = rssSources.filter((source) => source.enabled !== false);
+export const activeRssSources = rssSources.filter((source) => source.enabled !== false && isSourceProcessingAllowed(source.name, source.rss_url));
 
 const PREMIER_INELIGIBLE_ACCESS = new Set<SourceAccessibility>([
   "mostly_paywalled",

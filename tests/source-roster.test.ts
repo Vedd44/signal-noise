@@ -90,7 +90,7 @@ test("V2 config contains the expanded 20-source roster", () => {
 
 test("Stratechery remains classified for retained stories but is disabled for ingestion", () => {
   assert.equal(rssSources.find((source) => source.name === "Stratechery")?.enabled, false);
-  assert.equal(activeRssSources.length, 19);
+  assert.equal(activeRssSources.length, 16);
   assert.equal(activeRssSources.some((source) => source.name === "Stratechery"), false);
 });
 

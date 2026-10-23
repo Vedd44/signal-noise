@@ -1,3 +1,4 @@
+import { isStoryProcessingAllowed } from "@/lib/source-policy";
 import { createHash } from "node:crypto";
 
 import { getPublishedStories } from "@/lib/data";
@@ -185,6 +186,12 @@ export async function runDailySignal(
     };
   }
 
+  // Do not rewrite a saved same-day selection: that can change idempotency keys
+  // during a partial-send retry. Stop safely instead; tomorrow selects fresh inventory.
+  if (savedSelection && [savedSelection.lead, ...savedSelection.worthKnowing, ...savedSelection.onRadar].some(story => !isStoryProcessingAllowed(story))) {
+    return { success: false, status: "failed", localDate: localTime.localDate,
+      selected: EMPTY_SELECTION, reason: "Saved selection contains a source excluded by current policy; no email sent" };
+  }
   const selection = savedSelection ?? selectDailySignalStories(stories, now.getTime());
 
   if (!selection) {
