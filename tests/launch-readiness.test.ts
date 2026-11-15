@@ -73,12 +73,12 @@ test('source retrieval rejects unknown hosts and local redirect targets before f
   } finally {global.fetch=previous;}
 });
 
-test('deduplication removes tracking variants and roundups while keeping distinct follow-ups',()=>{
+test('deduplication removes tracking variants while retaining roundups and distinct follow-ups',()=>{
   const original=story(0,{title:'Acme introduces a new chip for local AI',summary:'Acme announced a chip with 16 gigabytes of memory.'});
   const duplicate=story(1,{...original,id:'duplicate',url:original.url+'?utm_source=rss'});
   const roundup=story(2,{title:'The Download: chips and robots',raw_snippet:original.title+' More reporting.'});
   const followup=story(3,{title:original.title,summary:'Acme announced a chip with 32 gigabytes of memory.'});
-  assert.deepEqual(dedupeStories([original,duplicate,roundup,followup]).map(x=>x.id),[original.id,followup.id]);
+  assert.deepEqual(dedupeStories([original,duplicate,roundup,followup]).map(x=>x.id),[original.id,roundup.id,followup.id]);
 });
 
 test('daily selection refuses stale, empty, malformed, or incomplete issues',()=>{

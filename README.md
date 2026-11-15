@@ -50,7 +50,7 @@ Vercel calls `/api/run-pipeline` every six hours at 00:00, 06:00, 12:00, and 18:
 2. Skip unchanged stored URLs before paid AI calls, retaining existing IDs.
 3. Retrieve article evidence with bounded timeouts, size limits, publisher host checks, and five-way concurrency. Remove navigation/forms and find actual article bodies; otherwise use the RSS evidence.
 4. Generate structured summary, Signal, category, and score with GPT-6 Luna, three-way concurrency, 20-second requests, and at most two attempts. Source text is untrusted evidence, not instructions. Invalid outputs do not publish fallback copy.
-5. Upsert, retain published stories for 72 hours, and cap each source at six stories. Rank/diversify consistently across the feed and email. Conservative URL/event/roundup deduplication hides repeats without deleting stored records.
+5. Upsert, retain published stories for 72 hours, and cap each source at six stories. Rank/diversify consistently across the feed and email. URL/event deduplication hides repeats without deleting stored records. A roundup is not hidden merely for quoting a standalone headline; it may contain additional developments.
 
 A private database claim prevents overlapping runs. All-source or all-generation failures report errors. Per-source failures and enrichment counts appear in run metrics. Pending feedback notifications are retried after ingestion. The route has a five-minute execution limit; abandoned claims recover after six minutes.
 

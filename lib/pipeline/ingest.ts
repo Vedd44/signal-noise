@@ -218,7 +218,8 @@ function normalizeSnippet(item: ParsedFeedItem) {
     item.summary,
     item.contentSnippet
   ]
-    .map((value) => normalizeExternalText(value ?? "", { stripHtml: true }))
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => normalizeExternalText(value, { stripHtml: true }))
     .filter(Boolean)
     .sort((left, right) => right.length - left.length);
 
@@ -228,7 +229,7 @@ function normalizeSnippet(item: ParsedFeedItem) {
 function normalizePublishedAt(item: ParsedFeedItem) {
   const publishedAt = item.isoDate ?? item.pubDate ?? "";
 
-  if (!publishedAt || !isValidIsoDate(publishedAt)) {
+  if (typeof publishedAt !== "string" || !publishedAt || !isValidIsoDate(publishedAt)) {
     return null;
   }
 
@@ -240,7 +241,10 @@ function normalizeItem(
   item: ParsedFeedItem,
   feedLanguage?: string
 ): NormalizedStory | null {
-  const title = normalizeExternalText(item.title ?? "", { stripHtml: true });
+  // RSS libraries can return XML objects despite their scalar TypeScript types.
+  // Reject malformed required fields per item, preserving valid siblings.
+  if (typeof item.title !== "string" || typeof item.link !== "string") return null;
+  const title = normalizeExternalText(item.title, { stripHtml: true });
   const url = publicHttpUrl(item.link?.trim() ?? "");
   const published_at = normalizePublishedAt(item);
 
