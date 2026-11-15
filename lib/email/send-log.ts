@@ -9,6 +9,7 @@ export type DailySignalClaimResult =
     };
 
 export type DailySignalSendLog = {
+  loadPreviousSentSelection?(localDate: string): Promise<DailySignalSelection | null>;
   loadSelection?(localDate: string): Promise<DailySignalSelection | null>;
   claim(localDate: string, contentHash: string, attemptedAt: string, selection?: DailySignalSelection): Promise<DailySignalClaimResult>;
   markSent(localDate: string, providerMessageId: string, sentAt: string): Promise<void>;
@@ -51,6 +52,18 @@ export function createSupabaseDailySignalSendLog(): DailySignalSendLog {
   const supabase = getSupabaseServiceClient();
 
   return {
+    async loadPreviousSentSelection(localDate) {
+      // localDate is already the campaign's America/New_York calendar date.
+      // Calendar arithmetic in UTC avoids DST-length assumptions.
+      const previousDate = new Date(`${localDate}T12:00:00Z`);
+      previousDate.setUTCDate(previousDate.getUTCDate() - 1);
+      const result = await supabase.from("daily_signal_sends").select("selection_snapshot")
+        .eq("local_date", previousDate.toISOString().slice(0, 10)).eq("status", "sent").maybeSingle();
+      if (result.error || (result.data && !result.data.selection_snapshot)) {
+        throw new Error("Previous campaign snapshot unavailable");
+      }
+      return (result.data?.selection_snapshot as DailySignalSelection) ?? null;
+    },
     async loadSelection(localDate) {
       const result = await supabase.from("daily_signal_sends").select("selection_snapshot").eq("local_date",localDate).maybeSingle();
       if (result.error) throw new Error("Campaign snapshot unavailable");

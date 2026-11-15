@@ -163,12 +163,16 @@ export async function runDailySignal(
 
   let stories: Story[];
   let savedSelection: DailySignalSelection | null = null;
+  let previousSentSelection: DailySignalSelection | null = null;
   let persistedSendLog = options.sendLog;
 
   try {
     if (!options.stories && !options.loadStories) {
       persistedSendLog ??= createSupabaseDailySignalSendLog();
       savedSelection = await persistedSendLog.loadSelection?.(localTime.localDate) ?? null;
+    }
+    if (!savedSelection) {
+      previousSentSelection = await persistedSendLog?.loadPreviousSentSelection?.(localTime.localDate) ?? null;
     }
     stories = savedSelection ? [] : options.stories ?? (await loadStoryInventory(options));
   } catch (error) {
@@ -192,7 +196,7 @@ export async function runDailySignal(
     return { success: false, status: "failed", localDate: localTime.localDate,
       selected: EMPTY_SELECTION, reason: "Saved selection contains a source excluded by current policy; no email sent" };
   }
-  const selection = savedSelection ?? selectDailySignalStories(stories, now.getTime());
+  const selection = savedSelection ?? selectDailySignalStories(stories, now.getTime(), previousSentSelection);
 
   if (!selection) {
     console.log("[daily-signal] skipped because no eligible stories were available");

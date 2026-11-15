@@ -1,0 +1,146 @@
+{
+  "14": {
+    "bullets": [
+      "A Workday outage on November 13 left employees unable to access pay information, clock in, request time off, or complete benefits tasks as the company put some systems into maintenance mode.",
+      "Nvidia says Jensen Huang has resigned as CEO, with CFO Colette Kress serving as interim chief, amid reported affairs and scrutiny over alleged links to a suspected Chinese spy.",
+      "New York City Council approved a bill banning businesses from using customers’ personal data to set different prices for the same product, with fines up to $1,000 per violation.",
+      "OpenAI introduced ChatGPT Wallet, letting its AI agents prepare purchases for US Pro subscribers, with each transaction requiring biometric approval and using a payment token instead of card details.",
+      "Nvidia said CEO Jensen Huang had resigned after reports of multiple extramarital relationships; CFO Colette Kress will lead the company while its board searches for a permanent successor."
+    ],
+    "featured": [
+      {
+        "source": "Engadget",
+        "title": "Outage at HR platform Workday locks millions of employees out of their account",
+        "summary": "A Workday outage on November 13 left employees unable to access pay information, clock in, request time off, or complete benefits tasks as the company put some systems into maintenance mode.",
+        "why_it_matters": "When a shared HR platform falters, routine work and access to pay and benefits can be disrupted across many employers at once.",
+        "url": "https://www.engadget.com/2316804/workday-outage-locks-millions-employees-out-of-account/"
+      },
+      {
+        "source": "TechCrunch",
+        "title": "The unfolding Jensen Huang scandal: a timeline",
+        "summary": "Nvidia says Jensen Huang has resigned as CEO, with CFO Colette Kress serving as interim chief, amid reported affairs and scrutiny over alleged links to a suspected Chinese spy.",
+        "why_it_matters": "The leadership crisis is drawing congressional scrutiny to Nvidia’s China chip sales and export controls, putting corporate governance alongside national-security questions.",
+        "url": "https://techcrunch.com/2026/11/13/nvidia-ceo-jensen-huangs-affair-with-alleged-chinese-spy-a-timeline/"
+      },
+      {
+        "source": "The Record",
+        "title": "NYC to bar surveillance pricing as momentum for bans grows nationwide",
+        "summary": "New York City Council approved a bill banning businesses from using customers’ personal data to set different prices for the same product, with fines up to $1,000 per violation.",
+        "why_it_matters": "The ban joins rules in Seattle and several states, and could push companies to change pricing practices beyond New York City.",
+        "url": "https://therecord.media/nyc-council-passes-bill-ban-surveillance-pricing"
+      },
+      {
+        "source": "Engadget",
+        "title": "You can now tempt fate and give your banking information to ChatGPT",
+        "summary": "OpenAI introduced ChatGPT Wallet, letting its AI agents prepare purchases for US Pro subscribers, with each transaction requiring biometric approval and using a payment token instead of card details.",
+        "why_it_matters": "The design keeps final authorization with users, but agent shopping still faces adoption limits as some major travel and retail companies block automated purchases.",
+        "url": "https://www.engadget.com/2316137/you-can-now-tempt-fate-and-give-your-banking-information-to-chatgpt/"
+      }
+    ],
+    "radar": [
+      {
+        "title": "Jensen Huang and the end of the ‘lol nothing matters’ era of American politics",
+        "url": "https://www.platformer.news/jensen-huang-resigns-founder-cult-accountability/"
+      },
+      {
+        "title": "ChatGPT’s new Wallet lets AI agents shop and check out for you",
+        "url": "https://techcrunch.com/2026/11/13/chatgpts-new-wallet-lets-ai-agents-shop-and-check-out-for-you/"
+      },
+      {
+        "title": "Anthropic now lets you self-host Claude Managed Agents. The catch? 8 hours to act if it flags a safety risk in the software",
+        "url": "https://thenewstack.io/self-hosted-claude-managed-agents/"
+      },
+      {
+        "title": "Google Search gets a major upgrade with Gemini 4 Hydrogen",
+        "url": "https://blog.google/products-and-platforms/products/search/gemini-4-hydrogen-search-upgrade/"
+      },
+      {
+        "title": "Quantum Systems drones back in the air after malware scare",
+        "url": "https://www.theregister.com/security/2026/11/13/quantum-systems-drones-back-in-the-air-after-malware-scare/5309658"
+      },
+      {
+        "title": "More autonomy, fewer NDAs: Volunteers have new requests for brain implant trials",
+        "url": "https://www.technologyreview.com/2026/11/13/1148474/more-autonomy-fewer-ndas-volunteers-have-new-requests-for-brain-implant-trials/"
+      }
+    ],
+    "htmlBullets": [
+      "A Workday outage on November 13 left employees unable to access pay information, clock in, request time off, or complete benefits tasks as the company put some systems into maintenance mode.",
+      "Nvidia says Jensen Huang has resigned as CEO, with CFO Colette Kress serving as interim chief, amid reported affairs and scrutiny over alleged links to a suspected Chinese spy.",
+      "New York City Council approved a bill banning businesses from using customers’ personal data to set different prices for the same product, with fines up to $1,000 per violation.",
+      "OpenAI introduced ChatGPT Wallet, letting its AI agents prepare purchases for US Pro subscribers, with each transaction requiring biometric approval and using a payment token instead of card details.",
+      "Nvidia said CEO Jensen Huang had resigned after reports of multiple extramarital relationships; CFO Colette Kress will lead the company while its board searches for a permanent successor."
+    ]
+  },
+  "15": {
+    "bullets": [
+      "A router overloaded a critical FAA communications system after L3Harris upgraded copper wiring to fiber, triggering a nationwide ground stop and thousands of flight cancellations.",
+      "The RTX 2070 Super is the closest PC graphics card match for base PS5 performance, while the RTX 5060 Ti or Radeon RX 9060 XT can approximate the PS5 Pro’s raw GPU power.",
+      "DuckLake 1.1 launched alongside DuckDB 2.0.0 LTS, using a standard SQL database to store lakehouse table metadata instead of manifest files in object storage.",
+      "New York City Council approved a bill banning businesses from using customers’ personal data to set different prices for the same product, with fines up to $1,000 per violation.",
+      "Nvidia says Jensen Huang has resigned as CEO, with CFO Colette Kress serving as interim chief, amid reported affairs and scrutiny over alleged links to a suspected Chinese spy."
+    ],
+    "featured": [
+      {
+        "source": "TechCrunch",
+        "title": "Transportation secretary blames ‘routine’ equipment upgrade for grounding flights nationwide",
+        "summary": "A router overloaded a critical FAA communications system after L3Harris upgraded copper wiring to fiber, triggering a nationwide ground stop and thousands of flight cancellations.",
+        "why_it_matters": "The outage exposed how routine infrastructure work can disrupt air travel nationwide; the FAA is investigating the router and reviewing when such work happens.",
+        "url": "https://techcrunch.com/2026/11/14/transportation-secretary-blames-routine-equipment-upgrade-for-grounding-flights-nationwide/"
+      },
+      {
+        "source": "Engadget",
+        "title": "Which NVIDIA GPU is closest to the PS5? The answer isn't so simple",
+        "summary": "The RTX 2070 Super is the closest PC graphics card match for base PS5 performance, while the RTX 5060 Ti or Radeon RX 9060 XT can approximate the PS5 Pro’s raw GPU power.",
+        "why_it_matters": "Console performance depends on custom hardware and optimization, so matching its graphics card alone won’t guarantee equivalent results—or make a PC the cheaper 4K option.",
+        "url": "https://www.engadget.com/2313644/nvidia-gpu-ps5-closest-match-answer-not-simple/"
+      },
+      {
+        "source": "The New Stack",
+        "title": "DuckLake 1.1 solves the absurd complexity of data lakes at AI scale",
+        "summary": "DuckLake 1.1 launched alongside DuckDB 2.0.0 LTS, using a standard SQL database to store lakehouse table metadata instead of manifest files in object storage.",
+        "why_it_matters": "Keeping metadata in a relational database offers a simpler alternative to managing scattered manifests, while Parquet files continue to hold the data.",
+        "url": "https://thenewstack.io/ducklake-sql-lakehouse-metadata/"
+      },
+      {
+        "source": "The Record",
+        "title": "NYC to bar surveillance pricing as momentum for bans grows nationwide",
+        "summary": "New York City Council approved a bill banning businesses from using customers’ personal data to set different prices for the same product, with fines up to $1,000 per violation.",
+        "why_it_matters": "The ban joins rules in Seattle and several states, and could push companies to change pricing practices beyond New York City.",
+        "url": "https://therecord.media/nyc-council-passes-bill-ban-surveillance-pricing"
+      }
+    ],
+    "radar": [
+      {
+        "title": "The unfolding Jensen Huang scandal: a timeline",
+        "url": "https://techcrunch.com/2026/11/13/nvidia-ceo-jensen-huangs-affair-with-alleged-chinese-spy-a-timeline/"
+      },
+      {
+        "title": "You can now tempt fate and give your banking information to ChatGPT",
+        "url": "https://www.engadget.com/2316137/you-can-now-tempt-fate-and-give-your-banking-information-to-chatgpt/"
+      },
+      {
+        "title": "Jensen Huang and the end of the ‘lol nothing matters’ era of American politics",
+        "url": "https://www.platformer.news/jensen-huang-resigns-founder-cult-accountability/"
+      },
+      {
+        "title": "Google Search gets a major upgrade with Gemini 4 Hydrogen",
+        "url": "https://blog.google/products-and-platforms/products/search/gemini-4-hydrogen-search-upgrade/"
+      },
+      {
+        "title": "Got an iPhone Duo? These 9 settings make it easier to use",
+        "url": "https://techcrunch.com/2026/11/14/got-an-iphone-duo-these-9-settings-make-it-easier-to-use/"
+      },
+      {
+        "title": "Anthropic now lets you self-host Claude Managed Agents. The catch? 8 hours to act if it flags a safety risk in the software",
+        "url": "https://thenewstack.io/self-hosted-claude-managed-agents/"
+      }
+    ],
+    "htmlBullets": [
+      "A router overloaded a critical FAA communications system after L3Harris upgraded copper wiring to fiber, triggering a nationwide ground stop and thousands of flight cancellations.",
+      "The RTX 2070 Super is the closest PC graphics card match for base PS5 performance, while the RTX 5060 Ti or Radeon RX 9060 XT can approximate the PS5 Pro’s raw GPU power.",
+      "DuckLake 1.1 launched alongside DuckDB 2.0.0 LTS, using a standard SQL database to store lakehouse table metadata instead of manifest files in object storage.",
+      "New York City Council approved a bill banning businesses from using customers’ personal data to set different prices for the same product, with fines up to $1,000 per violation.",
+      "Nvidia says Jensen Huang has resigned as CEO, with CFO Colette Kress serving as interim chief, amid reported affairs and scrutiny over alleged links to a suspected Chinese spy."
+    ]
+  }
+}

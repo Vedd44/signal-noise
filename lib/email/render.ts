@@ -88,7 +88,9 @@ export function renderDailySignalEmail(
 ): RenderedDailySignalEmail {
   const localTime = getDailySignalLocalTime(sendDate);
   const subject = `The Signal | ${localTime.subjectDate}`;
-  const briefBullets = [selection.lead, ...selection.worthKnowing, ...selection.onRadar]
+  // Saved pre-versioned campaigns retain their original payload on retry.
+  const briefBullets = [selection.lead, ...selection.worthKnowing,
+    ...(selection.briefingVersion === 2 ? [] : selection.onRadar)]
     .slice(0, 5)
     .map((story) => story.summary);
   const briefHtml = briefBullets

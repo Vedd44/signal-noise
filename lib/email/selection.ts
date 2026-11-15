@@ -1,6 +1,6 @@
 import { isStoryProcessingAllowed } from "@/lib/source-policy";
 import { dedupeStories } from "@/lib/dedupe";
-import { publicHttpUrl } from "@/lib/urls";
+import { canonicalStoryUrl, publicHttpUrl } from "@/lib/urls";
 import { organizeBriefingStories } from "@/lib/briefing";
 import { orderStoriesForFeed } from "@/lib/utils";
 import type { Story } from "@/types/story";
@@ -10,6 +10,7 @@ const ON_RADAR_MAXIMUM = 6;
 const ON_RADAR_MAX_AGE_HOURS = 72;
 
 export type DailySignalSelection = {
+  briefingVersion?: 2;
   lead: Story;
   worthKnowing: Story[];
   onRadar: Story[];
@@ -21,7 +22,8 @@ function getAgeHours(story: Story, now: number) {
 
 export function selectDailySignalStories(
   stories: Story[],
-  now = Date.now()
+  now = Date.now(),
+  previousSentSelection: DailySignalSelection | null = null
 ): DailySignalSelection | null {
   stories = dedupeStories(stories.filter(story => {
     const published = Date.parse(story.published_at);
@@ -33,9 +35,18 @@ export function selectDailySignalStories(
   }
 
   const rankedStories = orderStoriesForFeed(stories, now);
-  const { leadStory, worthKnowingStories } = organizeBriefingStories(rankedStories, "All");
+  // Only identical coverage is ineligible for another full feature. Changed facts,
+  // analysis or headlines remain eligible; Radar links are not suppressed.
+  const previousFeatured = previousSentSelection
+    ? [previousSentSelection.lead, ...previousSentSelection.worthKnowing] : [];
+  const freshFeatured = rankedStories.filter(story => !previousFeatured.some(prior =>
+    canonicalStoryUrl(story.url) !== null && canonicalStoryUrl(story.url) === canonicalStoryUrl(prior.url) &&
+    story.title === prior.title && story.summary === prior.summary && story.why_it_matters === prior.why_it_matters
+  ));
+  if (!freshFeatured.some(story => getAgeHours(story, now) <= 24)) return null;
+  const { leadStory, worthKnowingStories } = organizeBriefingStories(freshFeatured, "All");
 
-  if (!leadStory || worthKnowingStories.length < 3) {
+  if (!leadStory || getAgeHours(leadStory, now) > 24 || worthKnowingStories.length < 3) {
     return null;
   }
 
@@ -85,6 +96,7 @@ export function selectDailySignalStories(
   }
 
   return {
+    briefingVersion: 2,
     lead: leadStory,
     worthKnowing: worthKnowingStories,
     onRadar
