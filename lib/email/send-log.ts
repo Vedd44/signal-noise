@@ -53,12 +53,14 @@ export function createSupabaseDailySignalSendLog(): DailySignalSendLog {
 
   return {
     async loadPreviousSentSelection(localDate) {
+      // Look past skipped days, but bound history to the 72-hour inventory window.
       // localDate is already the campaign's America/New_York calendar date.
       // Calendar arithmetic in UTC avoids DST-length assumptions.
       const previousDate = new Date(`${localDate}T12:00:00Z`);
-      previousDate.setUTCDate(previousDate.getUTCDate() - 1);
+      previousDate.setUTCDate(previousDate.getUTCDate() - 3);
       const result = await supabase.from("daily_signal_sends").select("selection_snapshot")
-        .eq("local_date", previousDate.toISOString().slice(0, 10)).eq("status", "sent").maybeSingle();
+        .gte("local_date", previousDate.toISOString().slice(0, 10)).lt("local_date", localDate)
+        .eq("status", "sent").order("local_date", { ascending: false }).limit(1).maybeSingle();
       if (result.error || (result.data && !result.data.selection_snapshot)) {
         throw new Error("Previous campaign snapshot unavailable");
       }

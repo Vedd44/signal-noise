@@ -55,16 +55,16 @@ function mockHistoryResponse(t: TestContext, response: unknown, status = 200) {
   return { sendLog: createSupabaseDailySignalSendLog(), requests };
 }
 
-test("history adapter selects only the prior New York calendar date with sent status", async (t) => {
+test("history adapter selects the latest earlier sent edition within three New York calendar days with sent status", async (t) => {
   const { sendLog, requests } = mockHistoryResponse(t, [{ selection_snapshot: previousSelection }]);
   const datePairs = [
-    ["2026-11-15", "2026-11-14"],
-    ["2026-11-01", "2026-10-31"],
-    ["2026-11-02", "2026-11-01"],
-    ["2026-03-08", "2026-03-07"],
-    ["2026-03-09", "2026-03-08"],
-    ["2027-01-01", "2026-12-31"],
-    ["2028-03-01", "2028-02-29"]
+    ["2026-11-15", "2026-11-12"],
+    ["2026-11-01", "2026-10-29"],
+    ["2026-11-02", "2026-10-30"],
+    ["2026-03-08", "2026-03-05"],
+    ["2026-03-09", "2026-03-06"],
+    ["2027-01-01", "2026-12-29"],
+    ["2028-03-01", "2028-02-27"]
   ];
 
   for (const [localDate, previousDate] of datePairs) {
@@ -72,7 +72,9 @@ test("history adapter selects only the prior New York calendar date with sent st
     const request = requests.at(-1)!;
     assert.equal(request.pathname, "/rest/v1/daily_signal_sends");
     assert.equal(request.searchParams.get("select"), "selection_snapshot");
-    assert.equal(request.searchParams.get("local_date"), `eq.${previousDate}`);
+    assert.deepEqual(request.searchParams.getAll("local_date"), [`gte.${previousDate}`, `lt.${localDate}`]);
+    assert.equal(request.searchParams.get("order"), "local_date.desc");
+    assert.equal(request.searchParams.get("limit"), "1");
     assert.equal(request.searchParams.get("status"), "eq.sent");
   }
   assert.equal(requests.length, datePairs.length);
