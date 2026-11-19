@@ -244,6 +244,11 @@ function normalizeItem(
   // RSS libraries can return XML objects despite their scalar TypeScript types.
   // Reject malformed required fields per item, preserving valid siblings.
   if (typeof item.title !== "string" || typeof item.link !== "string") return null;
+  // Unreadable language metadata must not bypass language eligibility or
+  // abort normalization of otherwise valid sibling items.
+  if ([item.language, item.dcLanguage].some(
+    (value) => value != null && typeof value !== "string"
+  )) return null;
   const title = normalizeExternalText(item.title, { stripHtml: true });
   const url = publicHttpUrl(item.link?.trim() ?? "");
   const published_at = normalizePublishedAt(item);
